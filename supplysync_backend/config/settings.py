@@ -15,16 +15,16 @@ import dj_database_url
 import os 
 import environ
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+print(os.path.join(BASE_DIR,'.env'))
 # Environment Variable Setup
-env = environ.Env(DEBUG=(bool,False))
+env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
-DATABASE_URL = os.getenv('DATABASE_URL')
+DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
 DB_HOST = os.getenv('DB_HOST')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -86,21 +86,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": os.environ.get('DB_PASSWORD'),
-        "HOST": os.environ.get('DB_HOST'),
-        "PORT": "5432",
+        "NAME": DB_NAME,
+        "USER": DB_USER,
+        "PASSWORD": DB_PASSWORD,
+        "HOST": DB_HOST,
+        "PORT": "6543",
         "DATABASE":"postgres"
     }
 }
-
-#DATABASES = {
-#    'default': dj_database_url.config(
-#        default=os.environ.get('DATABASE_URL')
-#    )
-#}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
