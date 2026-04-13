@@ -11,7 +11,18 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
+import os 
+import environ
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Environment Variable Setup
+env = environ.Env(DEBUG=(bool,False))
+environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
+DATABASE_URL = os.getenv('DATABASE_URL')
+DB_HOST = os.getenv('DB_HOST')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -72,13 +83,23 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": os.environ.get('DB_PASSWORD'),
+        "HOST": os.environ.get('DB_HOST'),
+        "PORT": "5432",
+        "DATABASE":"postgres"
     }
 }
+
+#DATABASES = {
+#    'default': dj_database_url.config(
+#        default=os.environ.get('DATABASE_URL')
+#    )
+#}
 
 
 # Password validation
