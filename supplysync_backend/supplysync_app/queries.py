@@ -24,52 +24,64 @@ MAX_STRING = 200
 
 # ADD CONTRAINTS VIA CONSTANTS
 
-def create_update_user(user_name: str, user_password: str):
-    product_obj, created = User.objects.get_or_create(name=user_name,password=user_password)
-    if created is False:
-        product_obj.name = user_name
-        product_obj.password = user_password
-        product_obj.save()
-        result = "User Updated."
-    else:
+def create_user(user_name: str, user_password: str):
+    User.objects.all().values_list('user_id', flat=True)
+    user_obj = User.objects.filter(name=user_name).first()
+    if user_obj is None:
+        User.objects.create(name=user_name,password=user_password)
         result = "User Created."
-    return result
-
-def get_user(id: int, user_name: str):
-    # Returns user object given user_id and/or name, hierarchical search 
-    # starting with id and cascading to name if not found. Returns string
-    # if user not found. 
-    user_obj = User.objects.get(user_id=id).first()
-    if user_obj is not None:
-            result = user_obj
     else:
-        user_obj = User.objects.get(name=user_name).first()
-        if user_obj is not None:
-            result = user_obj
-        else:
-            result = "User Not Found."
+        result = "User Already Exists."
     return result
 
-def delete_user_by_name(id: int, user_name: str):
-    # Deletes user object given user_id and/or name, hierarchical search 
-    # starting with id and cascading to name if not found. Returns string
-    # if user not found. 
-    user_obj = User.objects.get(user_id=id).first()
+def update_user(user_name: str, new_name: str, new_password: str):
+    result = "User Not Found."
+    user_obj = User.objects.filter(name=user_name).first()
+    if user_obj is not None:
+        if new_name:
+            user_obj2 = User.objects.filter(name=new_name).first()
+            if user_obj2 is not None and user_obj != user_obj2:
+                result = "Error Updating Username."
+            else:
+                user_obj.name = new_name
+                result = "User Updated."
+        if new_password:
+            user_obj.password = new_password
+            if result == "Error Updating Username." or result ==  "User Updated.":
+                result += " Password Updated."
+            else:
+                result = "Password Updated."
+            user_obj.password = new_password
+        user_obj.save()
+
+    return result
+
+def get_user(user_name: str):
+    
+    user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         result = user_obj
     else:
-        user_obj = User.objects.get(name=user_name).first()
-        if user_obj is not None:
-            result = user_obj
-        else:
-            result = "User Not Found."
+        result = "User Not Found."
+    return result
+
+def delete_user(user_name: str):
+    # Deletes user object given user_id and/or name, hierarchical search 
+    # starting with id and cascading to name if not found. Returns string
+    # if user not found. 
+
+    user_obj = User.objects.filter(name=user_name).first()
+    if user_obj is not None:
+        user_obj.delete()
+    else:
+        result = "User Not Found."
     return result
 
 def all_users():
     return User.objects.all()
 
-def create_update_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
-    user_obj = User.objects.get(user_id=user).first()
+def create_update_product(prod_name: str, prod_sku: str, prod_category: str, user_name: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
+    user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         product_obj, created = Product.objects.get_or_create(product_id=id,name=prod_name,sku=prod_sku,category=prod_category,user=user_obj,quantity=prod_quantity,weight=prod_weight,cost=prod_cost,price=prod_price).first()
         if created is False:
@@ -90,8 +102,8 @@ def create_update_product(id: int, prod_name: str, prod_sku: str, prod_category:
         result = "User Not Found."
     return result
 
-def get_product(name: str, sku: str, category: str, user: int, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
-    user_obj = User.objects.get(user_id=user).first()
+def get_product(name: str, sku: str, category: str, user_name: str, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
+    user_obj = User.objects.get(user_id=user_name).first()
     if user_obj is not None:
         products = Product.objects.get(user=user_obj)
         if name:
@@ -120,19 +132,19 @@ def get_product(name: str, sku: str, category: str, user: int, quantity_min: int
         products = "User Not Found."
     return products
 
-def delete_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float) -> QuerySet:
-    user_obj = User.objects.get(user_id=user).first()
+def delete_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user_name: str, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float) -> QuerySet:
+    user_obj = User.objects.filter(name=user_name).first()
     return_val = "User Not Found."
     if user_obj is not None:
         product = get_product(name=prod_name,sku=prod_sku,category=prod_category,user=user_obj,quantity=prod_quantity,weight=prod_weight,cost=prod_cost,price=prod_price).first()
         if product != "User Not Found." and product.exists():
-            product.get.delete()
+            product.delete()
             return_val = Product.objects.all(user=user_obj)
  
     return return_val
 
-def all_products(user: int):
-    user_obj = User.objects.get(user_id=user).first()
+def all_products(user_name: str):
+    user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         return_val = Product.objects.all(user=user_obj)
     else:
