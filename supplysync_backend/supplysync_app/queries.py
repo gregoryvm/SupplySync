@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 
-from models import (
+from .models import (
     User,
     Product
 )
@@ -24,15 +24,15 @@ MAX_STRING = 200
 
 # ADD CONTRAINTS VIA CONSTANTS
 
-def create_update_user(name: str, password: str):
-    product_obj, created = Product.objects.get_or_create(name,password).first()
+def create_update_user(user_name: str, user_password: str):
+    product_obj, created = User.objects.get_or_create(name=user_name,password=user_password)
     if created is False:
-        product_obj.name = name
-        product_obj.password = password
+        product_obj.name = user_name
+        product_obj.password = user_password
         product_obj.save()
-        result = "Product Updated."
+        result = "User Updated."
     else:
-        result = "Product Created."
+        result = "User Created."
     return result
 
 def get_user(id: int, user_name: str):
@@ -68,19 +68,19 @@ def delete_user_by_name(id: int, user_name: str):
 def all_users():
     return User.objects.all()
 
-def create_update_product(product: int, name: str, sku: str, category: str, user: int, quantity: int, weight: float, cost: float, price: float):
+def create_update_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
     user_obj = User.objects.get(user_id=user).first()
     if user_obj is not None:
-        product_obj, created = Product.objects.get_or_create(product,name,sku,category,user_obj,quantity,weight,cost,price).first()
+        product_obj, created = Product.objects.get_or_create(product_id=id,name=prod_name,sku=prod_sku,category=prod_category,user=user_obj,quantity=prod_quantity,weight=prod_weight,cost=prod_cost,price=prod_price).first()
         if created is False:
-            product_obj.name = name
-            product_obj.sku = sku
-            product_obj.category = category
+            product_obj.name = prod_name
+            product_obj.sku = prod_sku
+            product_obj.category = prod_category
             product_obj.user = user_obj
-            product_obj.quantity = quantity
-            product_obj.weight = weight
-            product_obj.cost = cost
-            product_obj.cost = price
+            product_obj.quantity = prod_quantity
+            product_obj.weight = prod_weight
+            product_obj.cost = prod_cost
+            product_obj.cost = prod_price
             product_obj.save()
             result = "Product Updated."
         else:
@@ -120,12 +120,12 @@ def get_product(name: str, sku: str, category: str, user: int, quantity_min: int
         products = "User Not Found."
     return products
 
-def delete_product(name: str, sku: str, category: str, user: int, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
+def delete_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float) -> QuerySet:
     user_obj = User.objects.get(user_id=user).first()
     return_val = "User Not Found."
     if user_obj is not None:
-        product = get_product(name,sku,category,user,quantity_min,quantity_max,weight_min,weight_max,cost_min,cost_max,price_min,price_max)
-        if product is not "User Not Found." and product.exists():
+        product = get_product(name=prod_name,sku=prod_sku,category=prod_category,user=user_obj,quantity=prod_quantity,weight=prod_weight,cost=prod_cost,price=prod_price).first()
+        if product != "User Not Found." and product.exists():
             product.get.delete()
             return_val = Product.objects.all(user=user_obj)
  

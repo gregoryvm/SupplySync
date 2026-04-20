@@ -14,6 +14,7 @@ from pathlib import Path
 import dj_database_url
 import os 
 import environ
+import random
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -92,7 +93,11 @@ DATABASES = {
         "PASSWORD": DB_PASSWORD,
         "HOST": DB_HOST,
         "PORT": "6543",
-        "DATABASE":"postgres"
+        "DATABASE":"postgres",
+        "TEST": {
+            "NAME": str(random.randint(1,100000000000000000)),
+            "CHARSET": "utf8",
+        }
     }
 }
 

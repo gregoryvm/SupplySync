@@ -14,7 +14,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     sku = models.CharField(max_length=200)
     category = models.CharField(max_length=200)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default = None)
     quantity = models.IntegerField()
     weight = models.FloatField()
     cost =  models.FloatField()

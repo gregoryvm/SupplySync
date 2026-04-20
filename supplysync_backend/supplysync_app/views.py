@@ -1,5 +1,6 @@
 from rest_framework.decorators import APIView
 from django.shortcuts import render
+from django.http import HttpResponse
 from .models import Product, User
 from .queries import *
 from rest_framework.response import Response
@@ -11,6 +12,9 @@ from .serializers import ProductSerializer
 
 # Create your views here.
 class ProductsView(APIView):
+    # temporary filler
+    def home_view(request):
+        return HttpResponse("Test")
     def get(self,request):
         user = self.request.user
         products = all_products(user)
