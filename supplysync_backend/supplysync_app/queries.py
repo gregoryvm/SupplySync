@@ -7,6 +7,10 @@ from models import (
 
 MAX_STRING = 200
 
+#    user_id = models.AutoField(primary_key=True)
+#    name = models.CharField(max_length=200)
+#    password = models.CharField(max_length=200)
+
 #    product_id = models.AutoField(primary_key=True)
 #    name = models.CharField(max_length=200)
 #    sku = models.CharField(max_length=200)
@@ -20,13 +24,49 @@ MAX_STRING = 200
 
 # ADD CONTRAINTS VIA CONSTANTS
 
-def create_update_user():
+def create_update_user(name: str, password: str):
+    product_obj, created = Product.objects.get_or_create(name,password).first()
+    if created is False:
+        product_obj.name = name
+        product_obj.password = password
+        product_obj.save()
+        result = "Product Updated."
+    else:
+        result = "Product Created."
+    return result
 
-def get_user():
+def get_user(id: int, user_name: str):
+    # Returns user object given user_id and/or name, hierarchical search 
+    # starting with id and cascading to name if not found. Returns string
+    # if user not found. 
+    user_obj = User.objects.get(user_id=id).first()
+    if user_obj is not None:
+            result = user_obj
+    else:
+        user_obj = User.objects.get(name=user_name).first()
+        if user_obj is not None:
+            result = user_obj
+        else:
+            result = "User Not Found."
+    return result
 
-def delete_user():
+def delete_user_by_name(id: int, user_name: str):
+    # Deletes user object given user_id and/or name, hierarchical search 
+    # starting with id and cascading to name if not found. Returns string
+    # if user not found. 
+    user_obj = User.objects.get(user_id=id).first()
+    if user_obj is not None:
+        result = user_obj
+    else:
+        user_obj = User.objects.get(name=user_name).first()
+        if user_obj is not None:
+            result = user_obj
+        else:
+            result = "User Not Found."
+    return result
 
 def all_users():
+    return User.objects.all()
 
 def create_update_product(product: int, name: str, sku: str, category: str, user: int, quantity: int, weight: float, cost: float, price: float):
     user_obj = User.objects.get(user_id=user).first()
@@ -50,7 +90,7 @@ def create_update_product(product: int, name: str, sku: str, category: str, user
         result = "User Not Found."
     return result
 
-def get_products(name: str, sku: str, category: str, user: int, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
+def get_product(name: str, sku: str, category: str, user: int, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
     user_obj = User.objects.get(user_id=user).first()
     if user_obj is not None:
         products = Product.objects.get(user=user_obj)
@@ -84,9 +124,9 @@ def delete_product(name: str, sku: str, category: str, user: int, quantity_min: 
     user_obj = User.objects.get(user_id=user).first()
     return_val = "User Not Found."
     if user_obj is not None:
-        products = get_products(name,sku,category,user,quantity_min,quantity_max,weight_min,weight_max,cost_min,cost_max,price_min,price_max)
-        if products is not "User Not Found." and products.exists():
-            products.get.delete()
+        product = get_product(name,sku,category,user,quantity_min,quantity_max,weight_min,weight_max,cost_min,cost_max,price_min,price_max)
+        if product is not "User Not Found." and product.exists():
+            product.get.delete()
             return_val = Product.objects.all(user=user_obj)
  
     return return_val
