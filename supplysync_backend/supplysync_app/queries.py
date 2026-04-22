@@ -80,24 +80,30 @@ def delete_user(user_name: str):
 def all_users():
     return User.objects.all()
 
-def create_update_product(prod_name: str, prod_sku: str, prod_category: str, user_name: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
+def create_update_product(prod_name: str, prod_sku: str, user_name: str, prod_category: str = None, prod_quantity: int = None, prod_weight: float = None, prod_cost: float = None, prod_price: float = None):
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
-        product_obj, created = Product.objects.get_or_create(product_id=id,name=prod_name,sku=prod_sku,category=prod_category,user=user_obj,quantity=prod_quantity,weight=prod_weight,cost=prod_cost,price=prod_price).first()
-        if created is False:
-            product_obj.name = prod_name
-            product_obj.sku = prod_sku
-            product_obj.category = prod_category
-            product_obj.user = user_obj
-            product_obj.quantity = prod_quantity
-            product_obj.weight = prod_weight
-            product_obj.cost = prod_cost
-            product_obj.cost = prod_price
-            product_obj.save()
-            result = "Product Updated."
-        else:
+        # exists = Product.objects.filter(name=prod_name,sku=prod_sku,user=user_obj).first()
+        name_exists = Product.objects.filter(name=prod_name,user=user_obj).first()
+        sku_exists = Product.objects.filter(sku=prod_sku,user=user_obj).first()   
+        # if name_exists is None and sku_exists is None and name_exists != sku_exists:
+        if name_exists is None and sku_exists is None and name_exists != sku_exists:
+            product_obj = Product.objects.create(name=prod_name,sku=prod_sku,user=user_obj)
             result = "Product Created."
-
+        else:
+            if name_exists is not None:
+                product_obj = name_exists
+            else:
+                product_obj = sku_exists      
+            result = "Product Updated."   
+        product_obj.name = prod_name
+        product_obj.sku = prod_sku
+        product_obj.category = prod_category
+        product_obj.quantity = prod_quantity
+        product_obj.weight = prod_weight
+        product_obj.cost = prod_cost
+        product_obj.price = prod_price                
+        product_obj.save()
     else:
         result = "User Not Found."
     return result
