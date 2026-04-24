@@ -11,6 +11,9 @@ from .queries import (
     get_user,
     all_users,
     create_update_product,
+    get_product,
+    delete_product,
+    all_products
 
 )
 # Create your tests here.
@@ -172,11 +175,12 @@ class ProductQueries(TestCase):
     def setUp(self):
         self.User3 = User.objects.create(name="User3",password="Password3")
         self.User4 = User.objects.create(name="User4",password="Password4")
+        self.User555 = None
         self.Product1 = Product.objects.create(name="Product1",sku="4225-776-3234",category="category1",user=self.User3,quantity=50,weight=10.5,cost=7.99,price=11.99)
         self.Product2 = Product.objects.create(name="Product2",sku="JH433GTU",category="category2",user=self.User3,quantity=33,weight=24.4,cost=20.99,price=24.99)
         self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
 
-    # create_update_product(prod_name: str, prod_sku: str, prod_category: str, user_name: int, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
+    # create_update_product(prod_name: str, prod_sku: str, user_name: str, prod_category: str, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
     def test_create_update_product(self):
 
         # Test Cases where mandatory fields are updated (sku and name)
@@ -198,4 +202,248 @@ class ProductQueries(TestCase):
         self.assertEqual(
             Product.objects.get(sku="9442-009-2731").name,
             "Product4"
+        )
+
+        # Test Cases where non-mandatory fields are updated
+        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_category="category3")
+        self.assertEqual(
+            result,
+            "Product Updated."
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product4").category,
+            "category3"
+        )
+
+        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",quantity=100)
+        self.assertEqual(
+            result,
+            "Product Updated."
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product4").quantity,
+            100
+        )
+
+        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",weight=20.0)
+        self.assertEqual(
+            result,
+            "Product Updated."
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product4").weight,
+            20.0
+        )
+
+        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",cost=11.99)
+        self.assertEqual(
+            result,
+            "Product Updated."
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product4").cost,
+            11.99
+        )
+
+        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",price=13.99)
+        self.assertEqual(
+            result,
+            "Product Updated."
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product4").cost,
+            13.99
+        )
+
+        # Test Cases where products are created
+        result = create_update_product(prod_name="Product5",prod_sku="7524-554-9991",user_name="User4")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            2
+        )
+
+        # Invalid Test Cases where products are created missing mandatory fields
+        result = create_update_product(prod_name="Product11",prod_sku="7842-314-9211")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+        result = create_update_product(prod_name="Product11",user_name="User4")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+        result = create_update_product(prod_name="Product11")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+        result = create_update_product(prod_sku="7842-314-9211",user_name="User4")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+        result = create_update_product(prod_sku="7842-314-9211")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+        result = create_update_product(user_name="User4")
+        self.assertEqual(
+            result,
+            "Product Created."
+        )
+        self.assertEqual(
+            len(Product.objects.all(name="Product5")),
+            8
+        )
+
+
+    #def get_product(name: str, sku: str, category: str, user_name: str, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
+    #def test_get_product(self):
+
+    def test_delete_product(self):
+        # Valid Test Cases 
+        result = delete_product(prod_name="Product3")
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.get(name="Product3"),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_sku="UI123QWO")
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(user_name="User4")
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_quantity=4)
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_weight=53.9)
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_cost=54.99)
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_price=74.99)
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        result = delete_product(prod_name="Product3",prod_sku="UI123QWO",prod_category="category1",user_name="User4",prod_quantity=4,prod_weight=53.9,prod_cost=54.99,prod_price=74.99)
+        self.assertEqual(
+            len(result),
+            0
+        )
+        self.assertEqual(
+            Product.objects.filter(name="Product3",user=self.User4).first(),
+            None
+        )
+        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+
+        # Invalid Test Cases
+        result = delete_product(user_name="User555")
+        self.assertEqual(
+            result,
+            "User Not Found."
+        )
+
+        result = delete_product(prod_name="Product200")
+        self.assertEqual(
+            result,
+            "Product Not Found."
+        )
+
+    #def all_products(user_name: str):
+    def test_all_products(self):
+        result = all_products(user_name="User3")
+        self.assertEqual(
+            len(result),
+            8
+        )
+        
+        result = all_products(user_name="User55")
+        self.assertEqual(
+            result,
+            "User Not Found."
         )

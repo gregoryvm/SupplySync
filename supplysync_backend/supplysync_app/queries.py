@@ -138,7 +138,7 @@ def get_product(name: str, sku: str, category: str, user_name: str, quantity_min
         products = "User Not Found."
     return products
 
-def delete_product(id: int, prod_name: str, prod_sku: str, prod_category: str, user_name: str, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float) -> QuerySet:
+def delete_product(prod_name: str, prod_sku: str, prod_category: str, user_name: str, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float) -> QuerySet:
     user_obj = User.objects.filter(name=user_name).first()
     return_val = "User Not Found."
     if user_obj is not None:
@@ -146,6 +146,8 @@ def delete_product(id: int, prod_name: str, prod_sku: str, prod_category: str, u
         if product != "User Not Found." and product.exists():
             product.delete()
             return_val = Product.objects.all(user=user_obj)
+        elif product is None():
+            return_val = "Product Not Found."
  
     return return_val
 
