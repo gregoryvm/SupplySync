@@ -111,29 +111,47 @@ def create_update_product(prod_name: str, prod_sku: str, user_name: str, prod_ca
 def get_product(name: str = None, sku: str = None, category: str = None, user_name: str = None, quantity_min: int = None, quantity_max: int = None, weight_min: float = None, weight_max: float = None, cost_min: float = None, cost_max: float = None, price_min: float = None, price_max: float = None) -> QuerySet:
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
+        products = Product.objects.all()
         products = Product.objects.filter(user=user_obj)
         if name:
-            products = Product.objects.filter(name__icontains = name)
+            products = Product.objects.filter(name__icontains=name,user=user_obj)
+
         if sku:
-            products = Product.objects.filter(sku__icontains = sku)
+            products = Product.objects.filter(sku__icontains=sku,user=user_obj)
         if category:
-            products = Product.objects.filter(category__icontains = category)
-        if quantity_min:
-            products = Product.objects.filter(quantity__gte = quantity_min)
-        if quantity_max:
-            products = Product.objects.filter(quantity__lte = quantity_max)
-        if weight_min:
-            products = Product.objects.filter(weight__gte = weight_min)
-        if weight_max:
-            products = Product.objects.filter(weight__lte = weight_max)
-        if cost_min:
-            products = Product.objects.filter(cost__gte = cost_min)
-        if cost_max:
-            products = Product.objects.filter(cost__lte = cost_max)
-        if price_min:
-            products = Product.objects.filter(price__gte = cost_min)
-        if price_max:
-            products = Product.objects.filter(price__lte = cost_max)
+            products = Product.objects.filter(category__icontains=category,user=user_obj)
+        
+        if quantity_min == quantity_max and quantity_min and quantity_max:
+            products = Product.objects.filter(quantity__gte=quantity_min,quantity__lte=quantity_max,user=user_obj)
+        else:
+            if quantity_min:
+                products = Product.objects.filter(quantity__gte=quantity_min,user=user_obj)
+            if quantity_max:
+                products = Product.objects.filter(quantity__lte=quantity_max,user=user_obj)
+
+        if weight_min == weight_max and weight_min and weight_max:
+            products = Product.objects.filter(weight__gte=weight_min,weight__lte=weight_max,user=user_obj)
+        else:
+            if weight_min:
+                products = Product.objects.filter(weight__gte=weight_min,user=user_obj)
+            if weight_max:
+                products = Product.objects.filter(weight__lte=weight_max,user=user_obj)
+        
+        if cost_min == cost_max and cost_min and cost_max:
+            products = Product.objects.filter(cost__gte=cost_min,cost__lte=cost_max,user=user_obj)
+        else:        
+            if cost_min:
+                products = Product.objects.filter(cost__gte=cost_min,user=user_obj)
+            if cost_max:
+                products = Product.objects.filter(cost__lte=cost_max,user=user_obj)
+
+        if price_min == price_max and price_min and price_max:
+            products = Product.objects.filter(price__gte=price_min,price__lte=price_max,user=user_obj)
+        else:
+            if price_min:
+                products = Product.objects.filter(price__gte=price_min,user=user_obj)
+            if price_max:
+                products = Product.objects.filter(price__lte=price_max,user=user_obj)
     else:
         products = "User Not Found."
     return products
@@ -143,7 +161,13 @@ def delete_product(prod_name: str = None, prod_sku: str = None, prod_category: s
     return_val = "User Not Found."
     if user_obj is not None:
         product = get_product(name=prod_name,sku=prod_sku,category=prod_category,user_name=user_obj.name,quantity_min=prod_quantity,quantity_max=prod_quantity,weight_min=prod_weight,weight_max=prod_weight,cost_min=prod_cost,cost_max=prod_cost,price_min=prod_price,price_max=prod_price).first()
-        if product != "User Not Found." and product is not None:
+        if isinstance(product, QuerySet):
+            if product.count() == 0:
+                return_val = "Product Not Found."
+            else:
+                product.delete()
+                return_val = Product.objects.filter(user=user_obj)
+        if product != "User Not Found." and product is not None and isinstance(product, QuerySet) == False:
             product.delete()
             return_val = Product.objects.filter(user=user_obj)
         elif product is None:
