@@ -28,11 +28,12 @@ def create_user(user_name: str, user_password: str):
     User.objects.all().values_list('user_id', flat=True)
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is None:
-        User.objects.create(name=user_name,password=user_password)
+        User.objects.create(name=user_name, password=user_password)
         result = "User Created."
     else:
         result = "User Already Exists."
     return result
+
 
 def update_user(user_name: str, new_name: str, new_password: str):
     result = "User Not Found."
@@ -47,7 +48,7 @@ def update_user(user_name: str, new_name: str, new_password: str):
                 result = "User Updated."
         if new_password:
             user_obj.password = new_password
-            if result == "Error Updating Username." or result ==  "User Updated.":
+            if result == "Error Updating Username." or result == "User Updated.":
                 result += " Password Updated."
             else:
                 result = "Password Updated."
@@ -56,8 +57,9 @@ def update_user(user_name: str, new_name: str, new_password: str):
 
     return result
 
+
 def get_user(user_name: str):
-    
+
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         result = user_obj
@@ -65,10 +67,11 @@ def get_user(user_name: str):
         result = "User Not Found."
     return result
 
+
 def delete_user(user_name: str):
-    # Deletes user object given user_id and/or name, hierarchical search 
+    # Deletes user object given user_id and/or name, hierarchical search
     # starting with id and cascading to name if not found. Returns string
-    # if user not found. 
+    # if user not found.
 
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
@@ -77,103 +80,126 @@ def delete_user(user_name: str):
         result = "User Not Found."
     return result
 
+
 def all_users():
     return User.objects.all()
 
-def create_update_product(prod_name: str, prod_sku: str, user_name: str, prod_category: str = None, prod_quantity: int = None, prod_weight: float = None, prod_cost: float = None, prod_price: float = None):
+
+def create_update_product(prod_name: str, prod_sku: str, user_name: str,
+                          prod_category: str = None, prod_quantity: int = None,
+                          prod_weight: float = None, prod_cost: float = None,
+                          prod_price: float = None):
+
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
-        # exists = Product.objects.filter(name=prod_name,sku=prod_sku,user=user_obj).first()
-        name_exists = Product.objects.filter(name=prod_name,user=user_obj).first()
-        sku_exists = Product.objects.filter(sku=prod_sku,user=user_obj).first()   
-        # if name_exists is None and sku_exists is None and name_exists != sku_exists:
-        if name_exists is None and sku_exists is None: #and name_exists != sku_exists:
-            product_obj = Product.objects.create(name=prod_name,sku=prod_sku,user=user_obj)
+        name_exists = Product.objects.filter(name=prod_name, user=user_obj).first()
+        sku_exists = Product.objects.filter(sku=prod_sku, user=user_obj).first()
+        if name_exists is None and sku_exists is None:
+            product_obj = Product.objects.create(name=prod_name, sku=prod_sku, user=user_obj)
             result = "Product Created."
         else:
             if name_exists is not None:
                 product_obj = name_exists
             else:
-                product_obj = sku_exists      
-            result = "Product Updated."   
+                product_obj = sku_exists
+            result = "Product Updated."
         product_obj.name = prod_name
         product_obj.sku = prod_sku
         product_obj.category = prod_category
         product_obj.quantity = prod_quantity
         product_obj.weight = prod_weight
         product_obj.cost = prod_cost
-        product_obj.price = prod_price                
+        product_obj.price = prod_price
         product_obj.save()
     else:
         result = "User Not Found."
     return result
 
-def get_product(name: str = None, sku: str = None, category: str = None, user_name: str = None, quantity_min: int = None, quantity_max: int = None, weight_min: float = None, weight_max: float = None, cost_min: float = None, cost_max: float = None, price_min: float = None, price_max: float = None) -> QuerySet:
+
+def get_product(name: str = None, sku: str = None,
+                category: str = None, user_name: str = None,
+                quantity_min: int = None, quantity_max: int = None,
+                weight_min: float = None, weight_max: float = None,
+                cost_min: float = None, cost_max: float = None,
+                price_min: float = None, price_max: float = None) -> QuerySet:
+
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         products = Product.objects.all()
-        products = Product.objects.filter(user=user_obj)
+        products = products.filter(user=user_obj)
         if name:
-            products = Product.objects.filter(name__icontains=name,user=user_obj)
+            products = products.filter(name__icontains=name, user=user_obj)
 
         if sku:
-            products = Product.objects.filter(sku__icontains=sku,user=user_obj)
+            products = products.filter(sku__icontains=sku, user=user_obj)
         if category:
-            products = Product.objects.filter(category__icontains=category,user=user_obj)
-        
+            products = products.filter(category__icontains=category, user=user_obj)
+
         if quantity_min == quantity_max and quantity_min and quantity_max:
-            products = Product.objects.filter(quantity__gte=quantity_min,quantity__lte=quantity_max,user=user_obj)
+            products = products.filter(quantity__gte=quantity_min, quantity__lte=quantity_max, user=user_obj)
         else:
             if quantity_min:
-                products = Product.objects.filter(quantity__gte=quantity_min,user=user_obj)
+                products = products.filter(quantity__gte=quantity_min, user=user_obj)
             if quantity_max:
-                products = Product.objects.filter(quantity__lte=quantity_max,user=user_obj)
+                products = products.filter(quantity__lte=quantity_max, user=user_obj)
 
         if weight_min == weight_max and weight_min and weight_max:
-            products = Product.objects.filter(weight__gte=weight_min,weight__lte=weight_max,user=user_obj)
+            products = products.filter(weight__gte=weight_min, weight__lte=weight_max, user=user_obj)
         else:
             if weight_min:
-                products = Product.objects.filter(weight__gte=weight_min,user=user_obj)
+                products = products.filter(weight__gte=weight_min, user=user_obj)
             if weight_max:
-                products = Product.objects.filter(weight__lte=weight_max,user=user_obj)
-        
+                products = products.filter(weight__lte=weight_max, user=user_obj)
+
         if cost_min == cost_max and cost_min and cost_max:
-            products = Product.objects.filter(cost__gte=cost_min,cost__lte=cost_max,user=user_obj)
-        else:        
+            products = products.filter(cost__gte=cost_min, cost__lte=cost_max, user=user_obj)
+        else:
             if cost_min:
-                products = Product.objects.filter(cost__gte=cost_min,user=user_obj)
+                products = products.filter(cost__gte=cost_min, user=user_obj)
             if cost_max:
-                products = Product.objects.filter(cost__lte=cost_max,user=user_obj)
+                products = products.filter(cost__lte=cost_max, user=user_obj)
 
         if price_min == price_max and price_min and price_max:
-            products = Product.objects.filter(price__gte=price_min,price__lte=price_max,user=user_obj)
+            products = products.filter(price__gte=price_min, price__lte=price_max, user=user_obj)
         else:
             if price_min:
-                products = Product.objects.filter(price__gte=price_min,user=user_obj)
+                products = products.filter(price__gte=price_min, user=user_obj)
             if price_max:
-                products = Product.objects.filter(price__lte=price_max,user=user_obj)
+                products = products.filter(price__lte=price_max, user=user_obj)
     else:
         products = "User Not Found."
     return products
 
-def delete_product(prod_name: str = None, prod_sku: str = None, prod_category: str = None, user_name: str = None, prod_quantity: int = None, prod_weight: float = None, prod_cost: float = None, prod_price: float = None) -> QuerySet:
+
+def delete_product(prod_name: str = None, prod_sku: str = None,
+                   prod_category: str = None, user_name: str = None,
+                   prod_quantity: int = None, prod_weight: float = None,
+                   prod_cost: float = None, prod_price: float = None) -> QuerySet:
+
     user_obj = User.objects.filter(name=user_name).first()
     return_val = "User Not Found."
     if user_obj is not None:
-        product = get_product(name=prod_name,sku=prod_sku,category=prod_category,user_name=user_obj.name,quantity_min=prod_quantity,quantity_max=prod_quantity,weight_min=prod_weight,weight_max=prod_weight,cost_min=prod_cost,cost_max=prod_cost,price_min=prod_price,price_max=prod_price).first()
+        product = get_product(name=prod_name, sku=prod_sku,
+                              category=prod_category, user_name=user_obj.name,
+                              quantity_min=prod_quantity, quantity_max=prod_quantity,
+                              weight_min=prod_weight, weight_max=prod_weight,
+                              cost_min=prod_cost, cost_max=prod_cost,
+                              price_min=prod_price, price_max=prod_price).first()
+
         if isinstance(product, QuerySet):
             if product.count() == 0:
                 return_val = "Product Not Found."
             else:
                 product.delete()
                 return_val = Product.objects.filter(user=user_obj)
-        if product != "User Not Found." and product is not None and isinstance(product, QuerySet) == False:
+        if product != "User Not Found." and product is not None and isinstance(product, QuerySet) is False:
             product.delete()
             return_val = Product.objects.filter(user=user_obj)
         elif product is None:
             return_val = "Product Not Found."
- 
+
     return return_val
+
 
 def all_products(user_name: str):
     user_obj = User.objects.filter(name=user_name).first()
@@ -181,4 +207,4 @@ def all_products(user_name: str):
         return_val = Product.objects.filter(user=user_obj)
     else:
         return_val = "User Not Found."
-    return return_val 
+    return return_val

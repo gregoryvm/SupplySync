@@ -1,22 +1,27 @@
 from rest_framework.decorators import APIView
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Product, User
-from .queries import *
+# from .models import Product, User
+from .queries import (
+    all_products,
+)
 from rest_framework.response import Response
-from .serializers import ProductSerializer 
-#User = get_user()
+from .serializers import ProductSerializer
+# User = get_user()
 
 # https://medium.com/@michal.drozdze/setting-up-a-django-api-with-django-rest-framework-drf-a-beginners-guide-cee5d61f00a6
 # ~~ Work in progress ~~
 
+
 # Create your views here.
 class ProductsView(APIView):
+
     # temporary filler
     def home_view(request):
         return HttpResponse("Test")
-    def get(self,request):
+
+    def get(self, request):
         user = self.request.user
         products = all_products(user)
-        serializer = ProductSerializer(products,many=True)
+        serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)

@@ -16,15 +16,17 @@ from .queries import (
     all_products
 
 )
+
+
 # Create your tests here.
 class UserQueries(TestCase):
 
     def setUp(self):
-        self.User1 = User.objects.create(name="User1",password="Password1")
-        self.User2 = User.objects.create(name="User2",password="Password2")
+        self.User1 = User.objects.create(name="User1", password="Password1")
+        self.User2 = User.objects.create(name="User2", password="Password2")
 
     def test_create_user(self):
-        
+
         result = create_user(user_name="Testing", user_password="1234")
         self.assertEqual(
             User.objects.filter(name="Testing", password="1234").exists(),
@@ -34,21 +36,21 @@ class UserQueries(TestCase):
             result,
             "User Created."
         )
-        self.assertEqual(len(User.objects.all()),3)
-        
+        self.assertEqual(len(User.objects.all()), 3)
+
         result = create_user(user_name="Testing", user_password="1234")
         self.assertEqual(
             result,
             "User Already Exists."
         )
-        self.assertEqual(len(User.objects.all()),3)
-        
+        self.assertEqual(len(User.objects.all()), 3)
+
         result = create_user(user_name="Testing", user_password="12345")
         self.assertEqual(
             result,
             "User Already Exists."
         )
-        self.assertEqual(len(User.objects.all()),3)
+        self.assertEqual(len(User.objects.all()), 3)
 
         result = create_user(user_name="Testing2", user_password="1234")
         self.assertEqual(
@@ -59,10 +61,10 @@ class UserQueries(TestCase):
             result,
             "User Created."
         )
-        self.assertEqual(len(User.objects.all()),4)
+        self.assertEqual(len(User.objects.all()), 4)
 
     def test_update_user(self):
-        
+
         # Test All Update Cases for A Non-existant User
         result = update_user(user_name="Nonexistant", new_name="User3", new_password="Password3")
         self.assertEqual(
@@ -82,7 +84,7 @@ class UserQueries(TestCase):
 
         # Valid Cases ~~~ Find way to make pervious tests not affect future tests by changing values ~~~
         result = update_user(user_name="User1", new_name="User3", new_password="Password3")
-        
+
         self.assertEqual(
             result,
             "User Updated. Password Updated."
@@ -93,7 +95,7 @@ class UserQueries(TestCase):
             result,
             "User Updated. Password Updated."
         )
-        
+
         result = update_user(user_name="User4", new_name=None, new_password="Password3")
         self.assertEqual(
             result,
@@ -143,7 +145,7 @@ class UserQueries(TestCase):
             result,
             "User Not Found."
         )
-    
+
     def test_all_users(self):
         result = all_users()
         self.assertEqual(
@@ -171,20 +173,27 @@ class UserQueries(TestCase):
 #    cost =  models.FloatField()
 #    price =  models.FloatField()
 
-class ProductQueries(TestCase):
-    def setUp(self):
-        self.User3 = User.objects.create(name="User3",password="Password3")
-        self.User4 = User.objects.create(name="User4",password="Password4")
-        self.User555 = None
-        self.Product1 = Product.objects.create(name="Product1",sku="4225-776-3234",category="category1",user=self.User3,quantity=50,weight=10.5,cost=7.99,price=11.99)
-        self.Product2 = Product.objects.create(name="Product2",sku="JH433GTU",category="category2",user=self.User3,quantity=33,weight=24.4,cost=20.99,price=24.99)
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
 
-    # create_update_product(prod_name: str, prod_sku: str, user_name: str, prod_category: str, prod_quantity: int, prod_weight: float, prod_cost: float, prod_price: float):
+class ProductQueries(TestCase):
+
+    def setUp(self):
+        self.User3 = User.objects.create(name="User3", password="Password3")
+        self.User4 = User.objects.create(name="User4", password="Password4")
+        self.User555 = None
+        self.Product1 = Product.objects.create(
+            name="Product1", sku="4225-776-3234", category="category1",
+            user=self.User3, quantity=50, weight=10.5, cost=7.99, price=11.99)
+        self.Product2 = Product.objects.create(
+            name="Product2", sku="JH433GTU", category="category2",
+            user=self.User3, quantity=33, weight=24.4, cost=20.99, price=24.99)
+        self.Product3 = Product.objects.create(
+            name="Product3", sku="UI123QWO", category="category1",
+            user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
+
     def test_create_update_product(self):
 
         # Test Cases where mandatory fields are updated (sku and name)
-        result = create_update_product(prod_name="Product1",prod_sku="9442-009-2731",user_name="User3")
+        result = create_update_product(prod_name="Product1", prod_sku="9442-009-2731", user_name="User3")
         self.assertEqual(
             result,
             "Product Updated."
@@ -194,7 +203,7 @@ class ProductQueries(TestCase):
             "9442-009-2731"
         )
 
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3")
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731", user_name="User3")
         self.assertEqual(
             result,
             "Product Updated."
@@ -205,7 +214,8 @@ class ProductQueries(TestCase):
         )
 
         # Test Cases where non-mandatory fields are updated
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_category="category3")
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731",
+                                       user_name="User3", prod_category="category3")
         self.assertEqual(
             result,
             "Product Updated."
@@ -215,7 +225,8 @@ class ProductQueries(TestCase):
             "category3"
         )
 
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_quantity=100)
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731",
+                                       user_name="User3", prod_quantity=100)
         self.assertEqual(
             result,
             "Product Updated."
@@ -225,7 +236,8 @@ class ProductQueries(TestCase):
             100
         )
 
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_weight=20.0)
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731",
+                                       user_name="User3", prod_weight=20.0)
         self.assertEqual(
             result,
             "Product Updated."
@@ -235,7 +247,8 @@ class ProductQueries(TestCase):
             20.0
         )
 
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_cost=11.99)
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731",
+                                       user_name="User3", prod_cost=11.99)
         self.assertEqual(
             result,
             "Product Updated."
@@ -245,7 +258,8 @@ class ProductQueries(TestCase):
             11.99
         )
 
-        result = create_update_product(prod_name="Product4",prod_sku="9442-009-2731",user_name="User3",prod_price=13.99)
+        result = create_update_product(prod_name="Product4", prod_sku="9442-009-2731",
+                                       user_name="User3", prod_price=13.99)
         self.assertEqual(
             result,
             "Product Updated."
@@ -256,21 +270,20 @@ class ProductQueries(TestCase):
         )
 
         # Test Cases where products are created
-        result = create_update_product(prod_name="Product5",prod_sku="7524-554-9991",user_name="User4")
+        result = create_update_product(prod_name="Product5", prod_sku="7524-554-9991", user_name="User4")
         self.assertEqual(
             result,
             "Product Created."
         )
         self.assertEqual(
-            #len(Product.objects.filter(name="Product5")),
             len(Product.objects.filter(user=self.User4)),
             2
         )
 
         # Invalid Test Cases where products are created missing mandatory fields
         try:
-            result = create_update_product(prod_name="Product11",prod_sku="7842-314-9211")
-        except:
+            result = create_update_product(prod_name="Product11", prod_sku="7842-314-9211")
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -282,8 +295,8 @@ class ProductQueries(TestCase):
         )
 
         try:
-            result = create_update_product(prod_name="Product11",user_name="User4")
-        except:
+            result = create_update_product(prod_name="Product11", user_name="User4")
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -296,7 +309,7 @@ class ProductQueries(TestCase):
 
         try:
             result = create_update_product(prod_name="Product11")
-        except:
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -306,9 +319,9 @@ class ProductQueries(TestCase):
             len(Product.objects.filter(name="Product5")),
             1
         )
-        try: 
-            result = create_update_product(prod_sku="7842-314-9211",user_name="User4")
-        except:
+        try:
+            result = create_update_product(prod_sku="7842-314-9211", user_name="User4")
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -321,7 +334,7 @@ class ProductQueries(TestCase):
 
         try:
             result = create_update_product(prod_sku="7842-314-9211")
-        except:
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -333,7 +346,7 @@ class ProductQueries(TestCase):
         )
         try:
             result = create_update_product(user_name="User4")
-        except:
+        except Exception:
             result = "Unable to create product."
         self.assertEqual(
             result,
@@ -344,12 +357,9 @@ class ProductQueries(TestCase):
             1
         )
 
-    # self.Product1 = Product.objects.create(name="Product4",sku=""9442-009-2731"",category="category3",user=self.User3,quantity=100,weight=20.0,cost=11.99,price=13.99)
-    # self.Product2 = Product.objects.create(name="Product2",sku="JH433GTU",category="category2",user=self.User3,quantity=33,weight=24.4,cost=20.99,price=24.99)
-    #def get_product(name: str, sku: str, category: str, user_name: str, quantity_min: int, quantity_max: int, weight_min: float, weight_max: float, cost_min: float, cost_max: float, price_min: float, price_max: float) -> QuerySet:
     def test_get_product(self):
-        # Valid Test Cases with one search field 
-        result = get_product(name="Product2",user_name="User3")
+        # Valid Test Cases with one search field
+        result = get_product(name="Product2", user_name="User3")
 
         self.assertQuerySetEqual(
             result,
@@ -361,7 +371,7 @@ class ProductQueries(TestCase):
             1
         )
 
-        result = get_product(sku="JH433GTU",user_name="User3")
+        result = get_product(sku="JH433GTU", user_name="User3")
         self.assertQuerySetEqual(
             result,
             Product.objects.filter(sku=self.Product2.sku, user=self.User3),
@@ -372,7 +382,7 @@ class ProductQueries(TestCase):
             1
         )
 
-        result = get_product(category="category2",user_name="User3")
+        result = get_product(category="category2", user_name="User3")
         self.assertQuerySetEqual(
             result,
             Product.objects.filter(category=self.Product2.category, user=self.User3),
@@ -383,161 +393,159 @@ class ProductQueries(TestCase):
             1
         )
 
-        result = get_product(quantity_min=33,user_name="User3")
+        result = get_product(quantity_min=33, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(quantity__gte = 33, user=self.User3),
+            Product.objects.filter(quantity__gte=33, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(quantity__gte = 33, user=self.User3)),
+            len(Product.objects.filter(quantity__gte=33, user=self.User3)),
             2
         )
 
-        result = get_product(quantity_max=50,user_name="User3")
+        result = get_product(quantity_max=50, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(quantity__lte = 50, user=self.User3),
+            Product.objects.filter(quantity__lte=50, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(quantity__lte = 50, user=self.User3)),
+            len(Product.objects.filter(quantity__lte=50, user=self.User3)),
             2
         )
 
-        result = get_product(weight_min=21,user_name="User3")
+        result = get_product(weight_min=21, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(weight__gte = 21, user=self.User3),
+            Product.objects.filter(weight__gte=21, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(weight__gte = 21, user=self.User3)),
+            len(Product.objects.filter(weight__gte=21, user=self.User3)),
             1
         )
 
-        result = get_product(weight_max=25,user_name="User3")
+        result = get_product(weight_max=25, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(weight__lte = 25, user=self.User3),
+            Product.objects.filter(weight__lte=25, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(weight__lte = 25, user=self.User3)),
+            len(Product.objects.filter(weight__lte=25, user=self.User3)),
             2
         )
 
-        result = get_product(cost_min=6.00,user_name="User3")
+        result = get_product(cost_min=6.00, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(cost__gte = 6.00, user=self.User3),
+            Product.objects.filter(cost__gte=6.00, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(cost__gte = 6.00, user=self.User3)),
+            len(Product.objects.filter(cost__gte=6.00, user=self.User3)),
             2
         )
 
-        result = get_product(cost_max=20.00,user_name="User3")
+        result = get_product(cost_max=20.00, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(cost__lte = 20.00, user=self.User3),
+            Product.objects.filter(cost__lte=20.00, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(cost__lte = 20.00, user=self.User3)),
+            len(Product.objects.filter(cost__lte=20.00, user=self.User3)),
             1
         )
 
-        result = get_product(price_min=15.00,user_name="User3")
+        result = get_product(price_min=15.00, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(price__gte = 15.00, user=self.User3),
+            Product.objects.filter(price__gte=15.00, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(price__gte = 15.00, user=self.User3)),
+            len(Product.objects.filter(price__gte=15.00, user=self.User3)),
             1
         )
 
-        result = get_product(price_max=27.99,user_name="User3")
-        print(result)
-        print(Product.objects.filter(price__lte = 27.99, user=self.User3))
+        result = get_product(price_max=27.99, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(price__lte = 27.99, user=self.User3),
+            Product.objects.filter(price__lte=27.99, user=self.User3),
             ordered=False
         )
         self.assertEqual(
-            len(Product.objects.filter(price__lte = 27.99, user=self.User3)),
+            len(Product.objects.filter(price__lte=27.99, user=self.User3)),
             2
         )
 
         # Valid Test Cases with multiple search fields
-        result = get_product(category="category2",price_max=27.99,user_name="User3")
+        result = get_product(category="category2", price_max=27.99, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(category=self.Product2.category, price__lte = 27.99, user=self.User3)
+            Product.objects.filter(category=self.Product2.category, price__lte=27.99, user=self.User3)
         )
         self.assertEqual(
-            len(Product.objects.filter(price__lte = 27.99, user=self.User3)),
+            len(Product.objects.filter(category=self.Product2.category, price__lte=27.99, user=self.User3)),
             1
         )
 
-        result = get_product(category="category2",weight_min=10,user_name="User3")
+        result = get_product(category="category2", weight_min=10, user_name="User3")
         self.assertQuerySetEqual(
             result,
-            Product.objects.filter(category=self.Product2.category, weight__gte = 10, user=self.User3)
+            Product.objects.filter(category=self.Product2.category, weight__gte=10, user=self.User3)
         )
         self.assertEqual(
-            len(Product.objects.filter(category=self.Product2.category, weight__gte = 10, user=self.User3)),
+            len(Product.objects.filter(category=self.Product2.category, weight__gte=10, user=self.User3)),
             1
         )
 
         # Valid Test Cases where no results are returned
-        result = get_product(price_max=1.99,user_name="User3")
-        self.assertEqual(
+        result = get_product(price_max=1.99, user_name="User3")
+        self.assertQuerySetEqual(
             result,
-            Product.objects.filter(price__lte = 1.99, user=self.User3)
+            Product.objects.filter(price__lte=1.99, user=self.User3)
         )
         self.assertEqual(
-            len(Product.objects.filter(price__lte = 1.99, user=self.User3)),
+            len(Product.objects.filter(price__lte=1.99, user=self.User3)),
             0
         )
 
-        result = get_product(category="category40", price_min=15.00,user_name="User3")
-        self.assertEqual(
+        result = get_product(category="category40", price_min=15.00, user_name="User3")
+        self.assertQuerySetEqual(
             result,
-            Product.objects.filter(category="category40", price__gte = 15.00, user=self.User3)
+            Product.objects.filter(category="category40", price__gte=15.00, user=self.User3)
         )
         self.assertEqual(
-            len(Product.objects.filter(category="category40", price__gte = 15.00, user=self.User3)),
+            len(Product.objects.filter(category="category40", price__gte=15.00, user=self.User3)),
             0
         )
 
         # Invalid Test Cases where no user is found
-        result = get_product(price_max=1.99,user_name="User555")
+        result = get_product(price_max=1.99, user_name="User555")
         self.assertEqual(
             result,
             "User Not Found."
         )
         self.assertEqual(
-            len(Product.objects.filter(price__lte = 1.99, user=self.User555)),
+            len(Product.objects.filter(price__lte=1.99, user=self.User555)),
             0
         )
 
-        result = get_product(category="category40", price_min=15.00,user_name="User555")
+        result = get_product(category="category40", price_min=15.00, user_name="User555")
         self.assertEqual(
             result,
             "User Not Found."
         )
         self.assertEqual(
-            len(Product.objects.filter(category="category40", price__gte = 15.00, user=self.User555)),
+            len(Product.objects.filter(category="category40", price__gte=15.00, user=self.User555)),
             0
         )
 
     def test_delete_product(self):
-        # Valid Test Cases 
+        # Valid Test Cases
         result = delete_product(prod_name="Product3", user_name=self.User4.name)
         self.assertEqual(
             len(result),
@@ -547,7 +555,8 @@ class ProductQueries(TestCase):
             Product.objects.filter(name="Product3").first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         result = delete_product(prod_sku="UI123QWO", user_name=self.User4.name)
         self.assertEqual(
@@ -555,10 +564,11 @@ class ProductQueries(TestCase):
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         result = delete_product(user_name=self.User4.name)
         self.assertEqual(
@@ -566,10 +576,11 @@ class ProductQueries(TestCase):
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         result = delete_product(prod_quantity=4, user_name=self.User4.name)
         self.assertEqual(
@@ -577,10 +588,11 @@ class ProductQueries(TestCase):
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         result = delete_product(prod_weight=53.9, user_name=self.User4.name)
         self.assertEqual(
@@ -588,20 +600,22 @@ class ProductQueries(TestCase):
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
         result = delete_product(prod_cost=54.99, user_name=self.User4.name)
         self.assertEqual(
             len(result),
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         result = delete_product(prod_price=74.99, user_name=self.User4.name)
         self.assertEqual(
@@ -609,21 +623,25 @@ class ProductQueries(TestCase):
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
-        result = delete_product(prod_name="Product3",prod_sku="UI123QWO",prod_category="category1", user_name=self.User4.name,prod_quantity=4,prod_weight=53.9,prod_cost=54.99,prod_price=74.99)
+        result = delete_product(prod_name="Product3", prod_sku="UI123QWO", prod_category="category1",
+                                user_name=self.User4.name, prod_quantity=4, prod_weight=53.9,
+                                prod_cost=54.99, prod_price=74.99)
         self.assertEqual(
             len(result),
             0
         )
         self.assertEqual(
-            Product.objects.filter(name="Product3",user=self.User4).first(),
+            Product.objects.filter(name="Product3", user=self.User4).first(),
             None
         )
-        self.Product3 = Product.objects.create(name="Product3",sku="UI123QWO",category="category1",user=self.User4,quantity=4,weight=53.9,cost=54.99,price=74.99)
+        self.Product3 = Product.objects.create(name="Product3", sku="UI123QWO", category="category1",
+                                               user=self.User4, quantity=4, weight=53.9, cost=54.99, price=74.99)
 
         # Invalid Test Cases
         result = delete_product(user_name="User666")
@@ -632,20 +650,19 @@ class ProductQueries(TestCase):
             "User Not Found."
         )
 
-        result = delete_product(prod_name="Product200",user_name="User4")
+        result = delete_product(prod_name="Product200", user_name="User4")
         self.assertEqual(
             result,
             "Product Not Found."
         )
 
-    #def all_products(user_name: str):
     def test_all_products(self):
         result = all_products(user_name="User3")
         self.assertEqual(
             len(result),
             2
         )
-        
+
         result = all_products(user_name="User55")
         self.assertEqual(
             result,

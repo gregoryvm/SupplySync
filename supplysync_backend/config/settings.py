@@ -11,17 +11,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import dj_database_url
-import os 
+import os
 import environ
 import random
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-print(os.path.join(BASE_DIR,'.env'))
+print(os.path.join(BASE_DIR, '.env'))
+
 # Environment Variable Setup
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_HOST = os.getenv('DB_HOST')
@@ -32,7 +32,7 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xd83$2z6)6iz4hc&3o!uye+gn4!od(gq2e32-+8@(#9$(iqm8a'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -93,9 +93,9 @@ DATABASES = {
         "PASSWORD": DB_PASSWORD,
         "HOST": DB_HOST,
         "PORT": "6543",
-        "DATABASE":"postgres",
+        "DATABASE": "postgres",
         "TEST": {
-            "NAME": str(random.randint(1,100000000000000000)),
+            "NAME": str(random.randint(1, 100000000000000000)),
             "CHARSET": "utf8",
         }
     }
