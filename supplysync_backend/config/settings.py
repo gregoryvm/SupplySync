@@ -68,7 +68,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['supplysync_app/templates/supplysync_app'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

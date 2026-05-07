@@ -1,8 +1,12 @@
 from django.urls import path
 from . import views
-# from .views import ProductsView
 
+app_name = 'supplysync'
 
 urlpatterns = [
-    path('', views.ProductsView.home_view, name='home_view'),
+    path('inventory/', views.ProductsView.inventory_view, name='inventory_view'),
+    path('signup/', views.ProductsView.signup_view, name='signup'),
+    path('login/', views.ProductsView.login_view, name='login'),
+    path('', views.ProductsView.home, name='home'),
 ]
+    
