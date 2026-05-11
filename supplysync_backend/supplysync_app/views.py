@@ -4,13 +4,15 @@ from django.http import HttpResponse
 from .models import Product, User
 from .queries import (
     all_products,
-    create_user
+    create_user,
+    create_update_product
 )
 from rest_framework.response import Response
+from rest_framework import generics
 from .serializers import UserSerializer, ProductSerializer
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 # User = get_user()
 
 # https://medium.com/@michal.drozdze/setting-up-a-django-api-with-django-rest-framework-drf-a-beginners-guide-cee5d61f00a6
@@ -19,7 +21,8 @@ from django.contrib.auth import login
 
 
 # Create your views here.
-class ProductsView(APIView):
+class UsersView(APIView):
+#class ProductsView(generics.CreateAPIView):
 
     # temporary filler
     def inventory_view(request):
@@ -31,7 +34,8 @@ class ProductsView(APIView):
             if form.is_valid():
                 form.save()
                 create_user(user_name=form.cleaned_data.get('username'), user_password=form.cleaned_data.get('password1'))
-                #User.objects.create(name=form.get('username'),password=form.get('password'))
+                user = form.get_user()
+                login(request,user)
                 return redirect('supplysync:inventory_view')
         else:
             form = UserCreationForm()
@@ -41,13 +45,39 @@ class ProductsView(APIView):
         if request.method == 'POST':
             form = AuthenticationForm(data=request.POST)
             if form.is_valid():
+                user = form.get_user()
+                login(request,user)
                 return redirect('supplysync:inventory_view')
         else:
             form = AuthenticationForm()
         return render(request,"login.html",{'form':form})
+
+    def logout_view(request):
+        if request.method == 'POST':
+            logout(request)
+            return redirect('supplysync:home')
     
     def home(request):
         return render(request,"home.html")
+    
+class ProductsView(APIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def create_view(request):
+        if request.method == 'POST':
+           create_update_product(prod_name=request.POST.get('product_name'),
+                                 prod_sku=request.POST.get('product_sku'),
+                                 prod_category=request.POST.get('product_category'),
+                                 user_name=request.user.user_name, 
+                                 prod_quantity=request.POST.get('product_quantity'),
+                                 prod_weight=request.POST.get('product_weight'),
+                                 prod_cost=request.POST.get('product_cost'),
+                                 prod_price=request.POST.get('product_price'))
+            
+        return render(request,"create_product.html")
+
+
 
     # def get(self, request):
     #    user = self.request.user

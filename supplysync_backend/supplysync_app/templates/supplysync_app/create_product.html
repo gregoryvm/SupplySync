@@ -1,0 +1,23 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+<h1>New Product</h1>
+<form method="post">
+    {% csrf_token %}
+    <p><br>Name:</p>
+    <input type="text" name="product_name">
+    <p><br>SKU:</p>
+    <input type="text" name="product_sku">
+    <p><br>Category:</p>
+    <input type="text" name="product_category">
+    <p><br>Quantity:</p>
+    <input type="text" name="product_quantity">
+    <p><br>Weight:</p>
+    <input type="text" name="product_weight">
+    <p><br>Cost:</p>
+    <input type="text" name="product_cost">
+    <p><br>Price:</p>
+    <input type="text" name="product_price">
+    <input type="submit"value="Submit">
+</form>
+{% endblock %}
