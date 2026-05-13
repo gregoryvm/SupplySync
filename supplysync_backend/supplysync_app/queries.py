@@ -1,5 +1,5 @@
 from django.db.models.query import QuerySet
-
+from django.db.models import Q
 from .models import (
     User,
     Product
@@ -127,23 +127,17 @@ def get_product(name: str = None, sku: str = None,
     if user_obj is not None:
         products = Product.objects.all()
         products = products.filter(user=user_obj)
-        if name:
-            products = products.filter(name__icontains=name, user=user_obj)
-
-        if sku:
-            products = products.filter(sku__icontains=sku, user=user_obj)
-        if category:
-            products = products.filter(category__icontains=category, user=user_obj)
-
-        if quantity_min == quantity_max and quantity_min and quantity_max:
+        products = products.filter(Q(name__icontains=name or "") | Q(sku__icontains=sku or "") | Q(category__icontains=category or ""), 
+                                   user=user_obj,)
+        if quantity_min == quantity_max and quantity_min is not None and quantity_max is not None:
             products = products.filter(quantity__gte=quantity_min, quantity__lte=quantity_max, user=user_obj)
         else:
-            if quantity_min:
+            if quantity_min is not None:
                 products = products.filter(quantity__gte=quantity_min, user=user_obj)
-            if quantity_max:
+            if quantity_max is not None:
                 products = products.filter(quantity__lte=quantity_max, user=user_obj)
 
-        if weight_min == weight_max and weight_min and weight_max:
+        if weight_min == weight_max and weight_min is not None and weight_max is not None:
             products = products.filter(weight__gte=weight_min, weight__lte=weight_max, user=user_obj)
         else:
             if weight_min:
@@ -151,7 +145,7 @@ def get_product(name: str = None, sku: str = None,
             if weight_max:
                 products = products.filter(weight__lte=weight_max, user=user_obj)
 
-        if cost_min == cost_max and cost_min and cost_max:
+        if cost_min == cost_max and cost_min is not None and cost_max is not None:
             products = products.filter(cost__gte=cost_min, cost__lte=cost_max, user=user_obj)
         else:
             if cost_min:
@@ -159,13 +153,13 @@ def get_product(name: str = None, sku: str = None,
             if cost_max:
                 products = products.filter(cost__lte=cost_max, user=user_obj)
 
-        if price_min == price_max and price_min and price_max:
+        if price_min == price_max and price_min is not None and price_max is not None:
             products = products.filter(price__gte=price_min, price__lte=price_max, user=user_obj)
         else:
             if price_min:
                 products = products.filter(price__gte=price_min, user=user_obj)
             if price_max:
-                products = products.filter(price__lte=price_max, user=user_obj)
+                products = products.filter(price__lte=price_max, user=user_obj)                          
     else:
         products = "User Not Found."
     return products

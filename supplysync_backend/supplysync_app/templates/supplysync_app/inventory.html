@@ -1,19 +1,55 @@
 {% extends 'base_layout.html' %}
-
+{% load static %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory</title>
-</head>
-<body>
-    <h1>Products</h1>
+<nav>
+    <ul>
+        <li>
+            <a href="{% url 'supplysync:create' %}">
+                <button type="submit">New Product</button>
+            </a>
+        </li>
+    </ul>
+</nav>
+<h2>User: {{user.get_username}}</h2>
+<h1>Products</h1>
+
+<form action="/search/"method="get">
+    <input type="text" name="q" placeholder="Search for names..">
+    <button type ="submit">Search</button>
+</form>
+
+<h2>Quantity:</h2>
+<form action="/quantity/"method="get">
+    Min: 
+    <input type="number" name="q_min" placeholer="Min">
+    Max: 
+    <input type="number" name="q_max" placeholer="Max">
+    <button type ="submit">Filter</button>
+</form>
+<table id="inventoryTable">
+    <tr>
+        <th>Name</th>
+        <th>SKU</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Weight</th>
+        <th>Cost</th>
+        <th>Price</th>
+
+
+    </tr>
     {%for product in products%}
-        <h2>{{product.name}}</h2>
-        <h2>{{user.get_username}}</h2>
+    <tr>
+        <td>{{product.name}}</td>
+        <td>{{product.sku}}</td>
+        <td>{{product.category}}</td>
+        <td>{{product.quantity}}</td>
+        <td>{{product.weight}}</td>
+        <td>{{product.cost}}</td>
+        <td>{{product.price}}</td>
     {%endfor%}
-</body>
-</html>
+    </tr>
+</table>
+<script src="{% static 'supplysync_app/js/scripts.js' %}"></script>
+<link rel="stylesheet" href="{% static 'supplysync_app/style.css' %}">
 {% endblock %}

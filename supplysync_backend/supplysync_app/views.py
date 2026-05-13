@@ -5,7 +5,9 @@ from .models import Product, User
 from .queries import (
     all_products,
     create_user,
-    create_update_product
+    create_update_product,
+    get_product
+   
 )
 from rest_framework.response import Response
 from rest_framework import generics
@@ -26,7 +28,8 @@ class UsersView(APIView):
 
     # temporary filler
     def inventory_view(request):
-        return render(request,"inventory.html")
+        products = all_products(request.user.username)
+        return render(request,"inventory.html",{"products":products})
     
     def signup_view(request):
         if request.method == 'POST':
@@ -36,7 +39,7 @@ class UsersView(APIView):
                 create_user(user_name=form.cleaned_data.get('username'), user_password=form.cleaned_data.get('password1'))
                 user = form.get_user()
                 login(request,user)
-                return redirect('supplysync:inventory_view')
+                return redirect('supplysync:inventory')
         else:
             form = UserCreationForm()
         return render(request,"signup.html",{'form':form})
@@ -47,7 +50,7 @@ class UsersView(APIView):
             if form.is_valid():
                 user = form.get_user()
                 login(request,user)
-                return redirect('supplysync:inventory_view')
+                return redirect('supplysync:inventory')
         else:
             form = AuthenticationForm()
         return render(request,"login.html",{'form':form})
@@ -69,13 +72,35 @@ class ProductsView(APIView):
            create_update_product(prod_name=request.POST.get('product_name'),
                                  prod_sku=request.POST.get('product_sku'),
                                  prod_category=request.POST.get('product_category'),
-                                 user_name=request.user.user_name, 
+                                 user_name=request.user.username, 
                                  prod_quantity=request.POST.get('product_quantity'),
                                  prod_weight=request.POST.get('product_weight'),
                                  prod_cost=request.POST.get('product_cost'),
                                  prod_price=request.POST.get('product_price'))
+           return redirect('supplysync:inventory')
             
         return render(request,"create_product.html")
+    
+    def search_view(request):
+        if request.method == 'GET':
+           products = get_product(name=request.GET.get('q'),
+                                 sku=request.GET.get('q'),
+                                 category=request.GET.get('q'),
+                                 user_name=request.user.username
+                                 )
+        else:
+            products = all_products(request.user.username)     
+        return render(request,"inventory.html",{"products":products})
+    
+    def quantity_filter(request):
+        if request.method == 'GET':
+            products = get_product(quantity_min=request.GET.get('q_min') or None,
+                                quantity_max=request.GET.get('q_max') or None,
+                                user_name=request.user.username
+                                )
+        else:
+            products = all_products(request.user.username)     
+        return render(request,"inventory.html",{"products":products})
 
 
 
