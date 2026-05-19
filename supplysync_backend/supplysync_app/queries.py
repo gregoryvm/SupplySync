@@ -123,43 +123,51 @@ def get_product(name: str = None, sku: str = None,
                 cost_min: float = None, cost_max: float = None,
                 price_min: float = None, price_max: float = None) -> QuerySet:
 
+    query = Q()
+    filters = {}
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         products = Product.objects.all()
-        products = products.filter(user=user_obj)
-        products = products.filter(Q(name__icontains=name or "") | Q(sku__icontains=sku or "") | Q(category__icontains=category or ""), 
-                                   user=user_obj,)
-        if quantity_min == quantity_max and quantity_min is not None and quantity_max is not None:
-            products = products.filter(quantity__gte=quantity_min, quantity__lte=quantity_max, user=user_obj)
-        else:
-            if quantity_min is not None:
-                products = products.filter(quantity__gte=quantity_min, user=user_obj)
-            if quantity_max is not None:
-                products = products.filter(quantity__lte=quantity_max, user=user_obj)
 
-        if weight_min == weight_max and weight_min is not None and weight_max is not None:
-            products = products.filter(weight__gte=weight_min, weight__lte=weight_max, user=user_obj)
-        else:
-            if weight_min:
-                products = products.filter(weight__gte=weight_min, user=user_obj)
-            if weight_max:
-                products = products.filter(weight__lte=weight_max, user=user_obj)
+        filters['user'] = user_obj
 
-        if cost_min == cost_max and cost_min is not None and cost_max is not None:
-            products = products.filter(cost__gte=cost_min, cost__lte=cost_max, user=user_obj)
-        else:
-            if cost_min:
-                products = products.filter(cost__gte=cost_min, user=user_obj)
-            if cost_max:
-                products = products.filter(cost__lte=cost_max, user=user_obj)
+        if name is not None:
+            query |= Q(**{'name__icontains':name})
+            #filters['name__icontains'] = name
+        
+        if sku is not None:
+            query |= Q(**{'sku__icontains':sku})
+            #filters['sku__icontains'] = sku
 
-        if price_min == price_max and price_min is not None and price_max is not None:
-            products = products.filter(price__gte=price_min, price__lte=price_max, user=user_obj)
-        else:
-            if price_min:
-                products = products.filter(price__gte=price_min, user=user_obj)
-            if price_max:
-                products = products.filter(price__lte=price_max, user=user_obj)                          
+        if category is not None:
+            query |= Q(**{'category__icontains':category})
+            #filters['category__icontains'] = category
+
+        if quantity_min is not None:
+            filters['quantity__gte'] = quantity_min
+
+        if quantity_max is not None:
+            filters['quantity__lte'] = quantity_max
+
+        if weight_min is not None:
+            filters['weight__gte'] = weight_min
+
+        if weight_max is not None:
+            filters['weight__lte'] = weight_max
+
+        if cost_min is not None:
+            filters['cost__gte'] = cost_min
+
+        if cost_max is not None:
+            filters['cost__lte'] = cost_max
+        
+        if price_min is not None:
+            filters['price__gte'] = price_min
+
+        if price_max is not None:
+            filters['price__lte'] = price_max
+  
+        products = products.filter(query,**filters)              
     else:
         products = "User Not Found."
     return products

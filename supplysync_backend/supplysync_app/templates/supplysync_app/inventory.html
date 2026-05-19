@@ -13,19 +13,40 @@
 <h2>User: {{user.get_username}}</h2>
 <h1>Products</h1>
 
-<form action="/search/"method="get">
-    <input type="text" name="q" placeholder="Search for names..">
-    <button type ="submit">Search</button>
-</form>
+<form method="get">
+    <input type="text" name="q" placeholder="Search for names.." value="{{request.GET.q}}">
 
-<h2>Quantity:</h2>
-<form action="/quantity/"method="get">
+    <h2>Quantity:</h2>
     Min: 
-    <input type="number" name="q_min" placeholer="Min">
+    <input type="number" step="any" name="q_min" value="{{request.GET.q_min}}">
     Max: 
-    <input type="number" name="q_max" placeholer="Max">
-    <button type ="submit">Filter</button>
+    <input type="number" step="any" name="q_max" value="{{request.GET.q_max}}">
+
+    <h2>Weight:</h2>
+    Min: 
+    <input type="number" step="any" name="w_min" value="{{request.GET.w_min}}">
+    Max: 
+    <input type="number" step="any" name="w_max" value="{{request.GET.w_max}}">
+
+    <h2>Cost:</h2>
+    Min: 
+    <input type="number" step="any" name="c_min" value="{{request.GET.c_min}}">
+    Max: 
+    <input type="number" step="any" name="c_max" value="{{request.GET.c_max}}">
+
+    <h2>Price:</h2>
+    Min: 
+    <input type="number" step="any" name="p_min" value="{{request.GET.p_min}}">
+    Max: 
+    <input type="number" step="any" name="p_max" value="{{request.GET.p_max}}">
+    <button type ="submit">Apply Filters</button>
 </form>
+<a href="{% url 'supplysync:inventory' %}">
+    <button type="submit">Reset Filters</button>
+</a>
+
+
+
 <table id="inventoryTable">
     <tr>
         <th>Name</th>

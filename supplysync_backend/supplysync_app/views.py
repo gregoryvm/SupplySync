@@ -25,11 +25,8 @@ from django.contrib.auth import login, logout
 # Create your views here.
 class UsersView(APIView):
 #class ProductsView(generics.CreateAPIView):
-
     # temporary filler
-    def inventory_view(request):
-        products = all_products(request.user.username)
-        return render(request,"inventory.html",{"products":products})
+
     
     def signup_view(request):
         if request.method == 'POST':
@@ -67,6 +64,24 @@ class ProductsView(APIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def inventory_view(request):
+        #products = all_products(request.user.username)
+        products = get_product(name=request.GET.get('q'),
+                                sku=request.GET.get('q'),
+                                category=request.GET.get('q'),
+                                user_name=request.user.username,
+                                quantity_min=request.GET.get('q_min') or None,
+                                quantity_max=request.GET.get('q_max') or None,
+                                weight_min=request.GET.get('w_min') or None,
+                                weight_max=request.GET.get('w_max') or None,
+                                cost_min=request.GET.get('c_min') or None,
+                                cost_max=request.GET.get('c_max') or None,
+                                price_min=request.GET.get('p_min') or None,
+                                price_max=request.GET.get('p_max') or None,
+                                )
+        
+        return render(request,"inventory.html",{"products":products})
+
     def create_view(request):
         if request.method == 'POST':
            create_update_product(prod_name=request.POST.get('product_name'),
@@ -80,29 +95,6 @@ class ProductsView(APIView):
            return redirect('supplysync:inventory')
             
         return render(request,"create_product.html")
-    
-    def search_view(request):
-        if request.method == 'GET':
-           products = get_product(name=request.GET.get('q'),
-                                 sku=request.GET.get('q'),
-                                 category=request.GET.get('q'),
-                                 user_name=request.user.username
-                                 )
-        else:
-            products = all_products(request.user.username)     
-        return render(request,"inventory.html",{"products":products})
-    
-    def quantity_filter(request):
-        if request.method == 'GET':
-            products = get_product(quantity_min=request.GET.get('q_min') or None,
-                                quantity_max=request.GET.get('q_max') or None,
-                                user_name=request.user.username
-                                )
-        else:
-            products = all_products(request.user.username)     
-        return render(request,"inventory.html",{"products":products})
-
-
 
     # def get(self, request):
     #    user = self.request.user
