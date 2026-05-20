@@ -6,7 +6,8 @@ from .queries import (
     all_products,
     create_user,
     create_update_product,
-    get_product
+    get_product,
+    delete_product
    
 )
 from rest_framework.response import Response
@@ -66,19 +67,20 @@ class ProductsView(APIView):
 
     def inventory_view(request):
         #products = all_products(request.user.username)
-        products = get_product(name=request.GET.get('q'),
-                                sku=request.GET.get('q'),
-                                category=request.GET.get('q'),
-                                user_name=request.user.username,
-                                quantity_min=request.GET.get('q_min') or None,
-                                quantity_max=request.GET.get('q_max') or None,
-                                weight_min=request.GET.get('w_min') or None,
-                                weight_max=request.GET.get('w_max') or None,
-                                cost_min=request.GET.get('c_min') or None,
-                                cost_max=request.GET.get('c_max') or None,
-                                price_min=request.GET.get('p_min') or None,
-                                price_max=request.GET.get('p_max') or None,
-                                )
+        if request.method == 'GET':
+            products = get_product(name=request.GET.get('q'),
+                                    sku=request.GET.get('q'),
+                                    category=request.GET.get('q'),
+                                    user_name=request.user.username,
+                                    quantity_min=request.GET.get('q_min') or None,
+                                    quantity_max=request.GET.get('q_max') or None,
+                                    weight_min=request.GET.get('w_min') or None,
+                                    weight_max=request.GET.get('w_max') or None,
+                                    cost_min=request.GET.get('c_min') or None,
+                                    cost_max=request.GET.get('c_max') or None,
+                                    price_min=request.GET.get('p_min') or None,
+                                    price_max=request.GET.get('p_max') or None,
+                                    )
         
         return render(request,"inventory.html",{"products":products})
 
@@ -92,9 +94,33 @@ class ProductsView(APIView):
                                  prod_weight=request.POST.get('product_weight'),
                                  prod_cost=request.POST.get('product_cost'),
                                  prod_price=request.POST.get('product_price'))
-           return redirect('supplysync:inventory')
-            
+           return redirect('supplysync:inventory')  
         return render(request,"create_product.html")
+    
+    def delete_view(request):
+        if request.method == 'POST':
+           delete_product(prod_name=request.POST.get('d_name'),
+                                 prod_sku=request.POST.get('d_sku'),
+                                 user_name=request.user.username)  
+        return redirect('supplysync:inventory')
+    
+    def edit_view(request,name,sku):
+        product = get_product(name=name,
+                                    sku=sku,
+                                    user_name=request.user.username,
+                                    )
+        product = product.first()
+        if request.method == 'POST':
+            create_update_product(prod_name=request.POST.get('product_name'),
+                                 prod_sku=request.POST.get('product_sku'),
+                                 prod_category=request.POST.get('product_category'),
+                                 user_name=request.user.username, 
+                                 prod_quantity=request.POST.get('product_quantity'),
+                                 prod_weight=request.POST.get('product_weight'),
+                                 prod_cost=request.POST.get('product_cost'),
+                                 prod_price=request.POST.get('product_price'))
+            return redirect('supplysync:inventory')
+        return render(request,"edit_product.html",{"product":product})
 
     # def get(self, request):
     #    user = self.request.user

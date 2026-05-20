@@ -61,6 +61,7 @@
     </tr>
     {%for product in products%}
     <tr>
+
         <td>{{product.name}}</td>
         <td>{{product.sku}}</td>
         <td>{{product.category}}</td>
@@ -68,8 +69,21 @@
         <td>{{product.weight}}</td>
         <td>{{product.cost}}</td>
         <td>{{product.price}}</td>
-    {%endfor%}
+        <td>
+            <a href="{% url 'supplysync:edit' product.name product.sku %}">
+                <button type="button">Edit</button>
+            </a>
+        </td>
+        <td>
+            <form action ="{%url 'supplysync:delete' %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="d_name" value="{{product.name}}">
+                <input type="hidden" name="d_sku" value="{{product.sku}}">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
     </tr>
+    {%endfor%}
 </table>
 <script src="{% static 'supplysync_app/js/scripts.js' %}"></script>
 <link rel="stylesheet" href="{% static 'supplysync_app/style.css' %}">
