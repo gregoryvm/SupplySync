@@ -14,19 +14,57 @@
   width: 100%; /* Full-width */
   border: 1px solid #ddd; /* Add a grey border */
   font-size: 18px; /* Increase font-size */
+  background-color: white;
+  
 }
 
 #inventoryTable th, #inventoryTable td {
   text-align: left; /* Left-align text */
   padding: 12px; /* Add padding */
+  
 }
 
 #inventoryTable tr {
   /* Add a bottom border to all table rows */
   border-bottom: 1px solid #ddd;
+
 }
 
 #inventoryTable tr.header, #inventoryTable tr:hover {
   /* Add a grey background color to the table header and on hover */
   background-color: #f1f1f1;
+}
+
+body{
+  background-color: gray;
+}
+
+.logo{
+  width: 455px;
+  height: auto;
+}
+
+.button-edit{
+  background-image: url("edit.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40px 40px;
+
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  cursor: pointer;
+}
+
+.button-delete{
+  background-image: url("trash.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40px 40px;
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  cursor: pointer;
 }

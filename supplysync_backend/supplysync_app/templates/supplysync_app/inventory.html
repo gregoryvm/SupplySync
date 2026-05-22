@@ -39,11 +39,17 @@
     <input type="number" step="any" name="p_min" value="{{request.GET.p_min}}">
     Max: 
     <input type="number" step="any" name="p_max" value="{{request.GET.p_max}}">
-    <button type ="submit">Apply Filters</button>
+
+    <div>
+        <button type ="submit">Apply Filters</button>
+
+        <a href="{% url 'supplysync:inventory' %}">
+            <button type="button">Reset Filters</button>
+        </a>
+    </div>
+
+
 </form>
-<a href="{% url 'supplysync:inventory' %}">
-    <button type="submit">Reset Filters</button>
-</a>
 
 
 
@@ -71,7 +77,7 @@
         <td>{{product.price}}</td>
         <td>
             <a href="{% url 'supplysync:edit' product.name product.sku %}">
-                <button type="button">Edit</button>
+                <button type="button" class="button-edit"></button>
             </a>
         </td>
         <td>
@@ -79,7 +85,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="d_name" value="{{product.name}}">
                 <input type="hidden" name="d_sku" value="{{product.sku}}">
-                <button type="submit">Delete</button>
+                <button type="submit" class="button-delete"></button>
             </form>
         </td>
     </tr>
