@@ -7,13 +7,15 @@ from .queries import (
     create_user,
     create_update_product,
     get_product,
-    delete_product
+    delete_product,
+    update_user,
+    delete_user
    
 )
 from rest_framework.response import Response
 from rest_framework import generics
 from .serializers import UserSerializer, ProductSerializer
-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 # User = get_user()
@@ -33,9 +35,9 @@ class UsersView(APIView):
         if request.method == 'POST':
             form = UserCreationForm(request.POST)
             if form.is_valid():
-                form.save()
+                user = form.save()
                 create_user(user_name=form.cleaned_data.get('username'), user_password=form.cleaned_data.get('password1'))
-                user = form.get_user()
+                #user = form.get_user()
                 login(request,user)
                 return redirect('supplysync:inventory')
         else:
@@ -57,6 +59,31 @@ class UsersView(APIView):
         if request.method == 'POST':
             logout(request)
             return redirect('supplysync:home')
+        
+    @login_required 
+    def account_view(request):          
+        if request.method == 'POST':
+            new_username = request.POST.get('newname')
+            new_password = request.POST.get('newpassword')
+            update_user(user_name=request.user.username,
+                        new_name=new_username or None,
+                        new_password=new_password or None
+                        )
+            user = request.user
+            if new_username:
+                user.username = request.POST.get('newname')
+            if new_password:   
+                user.set_password(new_password)
+            user.save()
+            return redirect('supplysync:inventory')
+        return render(request,"account.html")
+    
+    def delete_view(request,username):
+        if request.method == 'POST':
+           delete_user(user_name=username)  
+           user = request.user
+           user.delete()
+        return redirect('supplysync:home')
     
     def home(request):
         return render(request,"home.html")
@@ -97,10 +124,10 @@ class ProductsView(APIView):
            return redirect('supplysync:inventory')  
         return render(request,"create_product.html")
     
-    def delete_view(request):
+    def delete_view(request,name,sku):
         if request.method == 'POST':
-           delete_product(prod_name=request.POST.get('d_name'),
-                                 prod_sku=request.POST.get('d_sku'),
+           delete_product(prod_name=name,
+                                 prod_sku=sku,
                                  user_name=request.user.username)  
         return redirect('supplysync:inventory')
     

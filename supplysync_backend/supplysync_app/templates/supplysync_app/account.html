@@ -1,0 +1,16 @@
+{% extends 'base_layout.html' %}
+{% load static %}
+{% block content %}
+
+<form method="post">
+    <input type="text" name="newname" placeholder="Enter a new username..." value="{{request.POST.newname}}">
+    <input type="text" name="newpassword" placeholder="Enter a new password..." value="{{request.POST.password}}">
+    {% csrf_token %}
+    <button type ="submit">Submit Changes</button>
+</form>
+
+<form action ="{%url 'supplysync:delete' user.get_username %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Delete Account</button>
+            </form>
+{% endblock %}

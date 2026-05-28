@@ -76,17 +76,19 @@
         <td>{{product.cost}}</td>
         <td>{{product.price}}</td>
         <td>
+            {% if product.name and product.sku %}
             <a href="{% url 'supplysync:edit' product.name product.sku %}">
                 <button type="button" class="button-edit"></button>
             </a>
+            {% endif %}
         </td>
         <td>
-            <form action ="{%url 'supplysync:delete' %}" method="POST" style="display:inline;">
+            {% if product.name and product.sku %}
+            <form action ="{%url 'supplysync:delete' product.name product.sku %}" method="POST" style="display:inline;">
                 {% csrf_token %}
-                <input type="hidden" name="d_name" value="{{product.name}}">
-                <input type="hidden" name="d_sku" value="{{product.sku}}">
                 <button type="submit" class="button-delete"></button>
             </form>
+            {% endif %}
         </td>
     </tr>
     {%endfor%}

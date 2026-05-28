@@ -12,6 +12,16 @@
                 {% csrf_token %}
                 <button type="submit">Logout</button>
             </form>
+
+            <form class="account-link"action="{% url 'supplysync:account' %}"method="get">
+                {% csrf_token %}
+                <button type="submit">My Account</button>
+            </form>
+
+            <form class="inventory-link"action="{% url 'supplysync:inventory' %}"method="get">
+                {% csrf_token %}
+                <button type="submit">Inventory</button>
+            </form>
         </li>
     </ul>
 </nav>

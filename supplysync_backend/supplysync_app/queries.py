@@ -71,11 +71,12 @@ def get_user(user_name: str):
 def delete_user(user_name: str):
     # Deletes user object given user_id and/or name, hierarchical search
     # starting with id and cascading to name if not found. Returns string
-    # if user not found.
+    # if user not found or user was deleted.
 
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
         user_obj.delete()
+        result = "User Deleted."
     else:
         result = "User Not Found."
     return result
