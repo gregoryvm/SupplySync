@@ -1,0 +1,23 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+<h1>Edit Product</h1>
+<form method="post">
+    {% csrf_token %}
+    <p><br>Name: {{product.name}}</p>
+    <input type="text" name="product_name" value="{{ product.name }}">
+    <p><br>SKU:</p>
+    <input type="text" name="product_sku" value="{{ product.sku }}">
+    <p><br>Category:</p>
+    <input type="text" name="product_category" value="{{ product.category }}">
+    <p><br>Quantity:</p>
+    <input type="text" name="product_quantity" value="{{ product.quantity }}">
+    <p><br>Weight:</p>
+    <input type="text" name="product_weight" value="{{ product.weight }}">
+    <p><br>Cost:</p>
+    <input type="text" name="product_cost" value="{{ product.cost }}">
+    <p><br>Price:</p>
+    <input type="text" name="product_price" value="{{ product.price }}">
+    <input type="submit"value="Submit">
+</form>
+{% endblock %}

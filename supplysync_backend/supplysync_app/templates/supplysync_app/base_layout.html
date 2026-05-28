@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<body>
+<header class="wrapper">
+<link rel="stylesheet" href="{% static 'supplysync_app/style.css' %}">
+<img src="{% static 'supplysync_app/supplysync.png' %}" class="logo">
+<nav>
+    <ul>
+        <li>
+            <form class="logout-link"action="{% url 'supplysync:logout' %}"method="post">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+
+            <form class="account-link"action="{% url 'supplysync:account' %}"method="get">
+                {% csrf_token %}
+                <button type="submit">My Account</button>
+            </form>
+
+            <form class="inventory-link"action="{% url 'supplysync:inventory' %}"method="get">
+                {% csrf_token %}
+                <button type="submit">Inventory</button>
+            </form>
+        </li>
+    </ul>
+</nav>
+</header>
+{% block content %}
+{% endblock %}
+</body>
+</html>
