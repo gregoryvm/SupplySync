@@ -26,20 +26,20 @@ We're currently hosted at:
 ### Products
 | Method | Endpoint           | Description |
 | ------ | ------------------ | ----------- |
-| GET    | /inventory         | View a user's inventory dashboard |
-| GET    | /create            | Show product creation form |
-| POST   | /create            | Create a new product |
-| POST   | /delete/<str:name>/<str:sku> | Delete product |
-| POST   | /edit/<str:name>/<str:sku> | Edit product |
+| GET    | products/inventory         | View a user's inventory dashboard |
+| GET    | products/create            | Show product creation form |
+| POST   | products/create            | Create a new product |
+| POST   | products/delete/<str:name>/<str:sku> | Delete product |
+| POST   | products/edit/<str:name>/<str:sku> | Edit product |
 
 ### Users
 | Method | Endpoint           | Description |
 | ------ | ------------------ | ----------- |
-| POST   | /signup            | Registers a new user |
-| POST   | /login             | Log in a user |
-| POST   | /logout            | Logs out a user |
+| POST   | /account/signup            | Registers a new user |
+| POST   | /account/login             | Log in a user |
+| POST   | /account/logout            | Logs out a user |
 | GET    | /account           | View user account page |
-| POST   | /delete/<str:username> | Deletes a user account |
+| POST   | /account/delete/<str:username> | Deletes a user account |
 
 ### General
 | Method | Endpoint           | Description |
