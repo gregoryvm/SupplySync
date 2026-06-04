@@ -2,8 +2,9 @@
 
 {% block content %}
 <h1>Login</h1>
-<form class="site-form" action="/login/"method="post">
+<form class="site-form" action="{% url 'supplysync:login' %}" method="post">
     {% csrf_token %}
+    {{ form.non_field_errors }}
     {{form}}
     <input type="submit"value="Login">
 </form>

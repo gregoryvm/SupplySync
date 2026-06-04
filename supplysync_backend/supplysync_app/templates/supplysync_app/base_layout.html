@@ -18,7 +18,7 @@
                 <button type="submit">My Account</button>
             </form>
 
-            <form class="inventory-link"action="{% url 'supplysync:inventory' %}"method="get">
+            <form class="inventory-link"action="{% url 'supplysync:products' %}"method="get">
                 {% csrf_token %}
                 <button type="submit">Inventory</button>
             </form>

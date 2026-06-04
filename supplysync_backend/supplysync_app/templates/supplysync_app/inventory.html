@@ -4,7 +4,7 @@
 <nav>
     <ul>
         <li>
-            <a href="{% url 'supplysync:create' %}">
+            <a href="{% url 'supplysync:create-product' %}">
                 <button type="submit">New Product</button>
             </a>
         </li>
@@ -43,7 +43,7 @@
     <div>
         <button type ="submit">Apply Filters</button>
 
-        <a href="{% url 'supplysync:inventory' %}">
+        <a href="{% url 'supplysync:products' %}">
             <button type="button">Reset Filters</button>
         </a>
     </div>

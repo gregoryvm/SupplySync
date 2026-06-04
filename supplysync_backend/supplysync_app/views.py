@@ -26,6 +26,10 @@ from django.contrib.auth import login, logout
 
 
 # Create your views here.
+
+def home(request):
+        return render(request,"home.html")
+
 class UsersView(APIView):
 #class ProductsView(generics.CreateAPIView):
     # temporary filler
@@ -39,7 +43,7 @@ class UsersView(APIView):
                 create_user(user_name=form.cleaned_data.get('username'), user_password=form.cleaned_data.get('password1'))
                 #user = form.get_user()
                 login(request,user)
-                return redirect('supplysync:inventory')
+                return redirect('supplysync:products')
         else:
             form = UserCreationForm()
         return render(request,"signup.html",{'form':form})
@@ -50,7 +54,7 @@ class UsersView(APIView):
             if form.is_valid():
                 user = form.get_user()
                 login(request,user)
-                return redirect('supplysync:inventory')
+                return redirect('supplysync:products')
         else:
             form = AuthenticationForm()
         return render(request,"login.html",{'form':form})
@@ -75,7 +79,7 @@ class UsersView(APIView):
             if new_password:   
                 user.set_password(new_password)
             user.save()
-            return redirect('supplysync:inventory')
+            return redirect('supplysync:products')
         return render(request,"account.html")
     
     def delete_view(request,username):
@@ -85,8 +89,6 @@ class UsersView(APIView):
            user.delete()
         return redirect('supplysync:home')
     
-    def home(request):
-        return render(request,"home.html")
     
 class ProductsView(APIView):
     queryset = Product.objects.all()
@@ -121,7 +123,7 @@ class ProductsView(APIView):
                                  prod_weight=request.POST.get('product_weight'),
                                  prod_cost=request.POST.get('product_cost'),
                                  prod_price=request.POST.get('product_price'))
-           return redirect('supplysync:inventory')  
+           return redirect('supplysync:products')  
         return render(request,"create_product.html")
     
     def delete_view(request,name,sku):
@@ -129,7 +131,7 @@ class ProductsView(APIView):
            delete_product(prod_name=name,
                                  prod_sku=sku,
                                  user_name=request.user.username)  
-        return redirect('supplysync:inventory')
+        return redirect('supplysync:products')
     
     def edit_view(request,name,sku):
         product = get_product(name=name,
@@ -146,7 +148,7 @@ class ProductsView(APIView):
                                  prod_weight=request.POST.get('product_weight'),
                                  prod_cost=request.POST.get('product_cost'),
                                  prod_price=request.POST.get('product_price'))
-            return redirect('supplysync:inventory')
+            return redirect('supplysync:products')
         return render(request,"edit_product.html",{"product":product})
 
     # def get(self, request):
