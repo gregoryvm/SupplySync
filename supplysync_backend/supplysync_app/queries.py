@@ -60,7 +60,7 @@ def update_user(user_name: str, new_name: str, new_password: str):
 
 def get_user(user_name: str):
 
-    user_obj = User.objects.filter(name=user_name).first()
+    user_obj = User.objects.filter(name__exact=user_name).first()
     if user_obj is not None:
         result = user_obj
     else:

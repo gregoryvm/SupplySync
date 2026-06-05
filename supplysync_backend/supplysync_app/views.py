@@ -1,6 +1,6 @@
 from rest_framework.decorators import APIView
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import Product, User
 from .queries import (
     all_products,
@@ -9,7 +9,8 @@ from .queries import (
     get_product,
     delete_product,
     update_user,
-    delete_user
+    delete_user,
+    get_user
    
 )
 from rest_framework.response import Response
@@ -17,7 +18,10 @@ from rest_framework import generics
 from .serializers import UserSerializer, ProductSerializer
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib import messages
+from django.contrib.auth.password_validation import validate_password
+import re
 # User = get_user()
 
 # https://medium.com/@michal.drozdze/setting-up-a-django-api-with-django-rest-framework-drf-a-beginners-guide-cee5d61f00a6
@@ -68,25 +72,44 @@ class UsersView(APIView):
     def account_view(request):          
         if request.method == 'POST':
             new_username = request.POST.get('newname')
-            new_password = request.POST.get('newpassword')
-            update_user(user_name=request.user.username,
-                        new_name=new_username or None,
-                        new_password=new_password or None
-                        )
-            user = request.user
-            if new_username:
-                user.username = request.POST.get('newname')
-            if new_password:   
-                user.set_password(new_password)
-            user.save()
+            new_password = request.POST.get('newpassword')     
+            
+            if new_username and not re.fullmatch(r"[A-Za-z0-9@.+_-]+", new_username):
+                messages.error(request, "Invalid username characters.")
+                return redirect('supplysync:account')
+            elif len(new_username) > 150:
+                messages.error(request, "Username too long.")
+                return redirect('supplysync:account')
+            elif new_password and len(new_password) < 8:
+                messages.error(request, "Password too short.")
+                return redirect('supplysync:account')
+            elif new_username and get_user(new_username) != "User Not Found.":
+                messages.error(request, "Username already taken.")
+                return redirect('supplysync:account')
+            elif new_password and validate_password(new_password,user=request.user) is not None:
+                messages.error(request, "Invalid password.")
+                return redirect('supplysync:account')
+            else:
+                update_user(user_name=request.user.username,
+                            new_name=new_username or None,
+                            new_password=new_password or None
+                            )
+                user = request.user
+                if new_username:
+                    user.username = request.POST.get('newname')
+                if new_password:   
+                    user.set_password(new_password)
+                user.save()
+                update_session_auth_hash(request, user)
             return redirect('supplysync:products')
         return render(request,"account.html")
     
-    def delete_view(request,username):
+    @login_required 
+    def delete_view(request):  
         if request.method == 'POST':
-           delete_user(user_name=username)  
-           user = request.user
-           user.delete()
+           delete_user(user_name=request.user.username)  
+           request.user.delete()
+           
         return redirect('supplysync:home')
     
     
