@@ -39,7 +39,7 @@ We're currently hosted at:
 | POST   | /account/login             | Log in a user |
 | POST   | /account/logout            | Logs out a user |
 | GET    | /account           | View user account page |
-| POST   | /account/delete/<str:username> | Deletes a user account |
+| POST   | /account/delete | Deletes a user account |
 
 ### General
 | Method | Endpoint           | Description |
