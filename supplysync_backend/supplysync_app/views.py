@@ -263,14 +263,113 @@ class ProductsView(APIView):
                                     )
         product = product.first()
         if request.method == 'POST':
-            create_update_product(prod_name=request.POST.get('product_name'),
-                                 prod_sku=request.POST.get('product_sku'),
-                                 prod_category=request.POST.get('product_category'),
-                                 user_name=request.user.username, 
-                                 prod_quantity=request.POST.get('product_quantity'),
-                                 prod_weight=request.POST.get('product_weight'),
-                                 prod_cost=request.POST.get('product_cost'),
-                                 prod_price=request.POST.get('product_price'))
+            new_name = request.POST.get('product_name')
+            new_sku = request.POST.get('product_sku')
+            new_category = request.POST.get('product_category')
+            new_quantity = request.POST.get('product_quantity')
+            new_weight = request.POST.get('product_weight')
+            new_cost = request.POST.get('product_cost')
+            new_price = request.POST.get('product_price')
+            new_product = {"name": new_name, "sku": new_sku, "category": new_category,
+                           "quantity": new_quantity, "weight": new_weight, "cost": new_cost, "price": new_price
+
+            }
+
+            if new_name:
+                if not re.fullmatch(r"[A-Za-z0-9@.+_ -]+", new_name):
+                    messages.error(request, "Invalid product name characters.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                elif len(new_name) > 200:
+                    messages.error(request, "Product name too long.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product name must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            
+            if new_sku:
+                if not re.fullmatch(r"[A-Za-z0-9@.+_ -]+", new_sku):
+                    messages.error(request, "Invalid product sku characters.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                elif len(new_sku) > 200:
+                    messages.error(request, "Product sku too long.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product sku must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+
+            if new_category:
+                if not re.fullmatch(r"[A-Za-z0-9@.+_ -]+", new_category):
+                    messages.error(request, "Invalid product category characters.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                elif len(new_category) > 200:
+                    messages.error(request, "Product category too long.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product category must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            
+            if new_quantity:
+                try:
+                    new_quantity = float(new_quantity)
+                except ValueError:
+                    messages.error(request, "Product quantity must be a number.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                
+                if new_quantity < 0:
+                    messages.error(request, "Quantity must be positive.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                print("no quan")
+                messages.error(request, "Product quantity must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            
+            if new_weight:
+                try:
+                    new_weight = float(new_weight)
+                except ValueError:
+                    messages.error(request, "Product weight must be a number.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                if new_weight < 0:
+                    messages.error(request, "Weight must be positive.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product weight must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            
+            if new_cost:
+                try:
+                    new_cost = float(new_cost)
+                except ValueError:
+                    messages.error(request, "Product cost must be a number.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku) 
+                if new_cost < 0:
+                    messages.error(request, "Cost must be positive.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product cost must not be blank.")
+                return redirect('supplysync:create-product')
+            
+            if new_price:
+                try:
+                    new_price = float(new_price)
+                except ValueError:
+                    messages.error(request, "Product price must be a number.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+                if new_price < 0:
+                    messages.error(request, "Price must be positive.")
+                    return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            else:
+                messages.error(request, "Product price must not be blank.")
+                return redirect('supplysync:edit', name=product.name, sku=product.sku)
+            
+            create_update_product(prod_name=new_name,
+                                    prod_sku=new_sku,
+                                    prod_category=new_category,
+                                    user_name=request.user.username, 
+                                    prod_quantity=new_quantity,
+                                    prod_weight=new_weight,
+                                    prod_cost=new_cost,
+                                    prod_price=new_price)
             return redirect('supplysync:products')
         return render(request,"edit_product.html",{"product":product})
 
