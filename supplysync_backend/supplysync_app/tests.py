@@ -1,9 +1,11 @@
-from django.test import TestCase
-
+from django.db import connections
+from django.test import TestCase, Client
+from django.urls import reverse
 from .models import (
     User,
     Product
 )
+from django.contrib.auth.models import User as AuthUser
 
 from .queries import (
     create_user,
@@ -668,3 +670,275 @@ class ProductQueries(TestCase):
             result,
             "User Not Found."
         )
+
+
+class BaseTestCase(TestCase):
+    def setUp(self):
+        self.auth_user = AuthUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+
+        create_user(
+            user_name="testuser",
+            user_password="testpass123"
+        )
+
+        self.client = Client()
+        self.client.force_login(self.auth_user)
+    
+class HomeViewTests(BaseTestCase):
+    def test_home_page_loads(self):
+        response = self.client.get(reverse("supplysync:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "home.html")
+
+
+class SignupViewTests(TestCase):
+    def test_signup_creates_user(self):
+        response = self.client.post(reverse("supplysync:signup"), {
+            "username": "newuser",
+            "password1": "StrongPass123!",
+            "password2": "StrongPass123!"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(AuthUser.objects.filter(username="newuser").exists())
+
+    def test_signup_invalid_user_exists(self):
+        response = self.client.post(reverse("supplysync:signup"), {
+            "username": "testuser",
+            "password1": "StrongPass123!",
+            "password2": "StrongPass123!"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(AuthUser.objects.filter(username="testuser", password="StrongPass123!").exists())
+    
+    def test_signup_invalid_user_password_len(self):
+        response = self.client.post(reverse("supplysync:signup"), {
+            "username": "newuser2",
+            "password1": "4444",
+            "password2": "4444"
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(AuthUser.objects.filter(username="newuser2", password="4444").exists())
+    
+    def test_signup_invalid_user_password_match(self):
+        response = self.client.post(reverse("supplysync:signup"), {
+            "username": "newuser4",
+            "password1": "StrongPass123!",
+            "password2": "StrongPass1234!"
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(AuthUser.objects.filter(username="newuser3").exists())
+
+    def test_signup_invalid_user_username(self):
+        response = self.client.post(reverse("supplysync:signup"), {
+            "username": "!!!!!!!!!!!!!!!!!!!!!!!",
+            "password1": "StrongPass123!",
+            "password2": "StrongPass123!"
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(AuthUser.objects.filter(username="!!!!!!!!!!!!!!!!!!!!!!!", password="StrongPass123!").exists())
+
+class LoginViewTests(TestCase):
+    def setUp(self):
+        self.user = AuthUser.objects.create_user(
+            username="loginuser",
+            password="testpass123"
+        )
+
+    def test_login_success(self):
+        response = self.client.post(reverse("supplysync:login"), {
+            "username": "loginuser",
+            "password": "testpass123"
+        })
+
+        self.assertEqual(response.status_code, 302)
+
+class LogoutViewTests(BaseTestCase):
+    def test_logout_redirects(self):
+        response = self.client.post(reverse("supplysync:logout"))
+        self.assertEqual(response.status_code, 302)
+
+class AccountViewTests(BaseTestCase):
+    def test_account_username_change(self):
+        response = self.client.post(reverse("supplysync:account"), {
+            "newname": "updateduser"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(AuthUser.objects.filter(username="updateduser").exists())
+
+    def test_invalid_username_rejected(self):
+        response = self.client.post(reverse("supplysync:account"), {
+            "newname": "invalid!!!"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(AuthUser.objects.filter(username="invalid!!!").exists())
+
+    def test_account_password_change(self):
+        response = self.client.post(reverse("supplysync:account"), {
+            "newpassword": "StrongPass12345!"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        user = AuthUser.objects.get(pk=self.auth_user.pk)
+        self.assertTrue(user.check_password("StrongPass12345!"))
+
+    def test_invalid_password_rejected(self):
+        response = self.client.post(reverse("supplysync:account"), {
+            "newpassword": "4444"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        user = AuthUser.objects.get(pk=self.auth_user.pk)
+        self.assertFalse(user.check_password("4444"))
+class CreateProductViewTests(BaseTestCase):
+    def test_valid_product_creation(self):
+        response = self.client.post(reverse("supplysync:create-product"), {
+            "product_name": "Widget",
+            "product_sku": "SKU123",
+            "product_category": "Tools",
+            "product_quantity": "10",
+            "product_weight": "1.5",
+            "product_cost": "5",
+            "product_price": "10"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertTrue(Product.objects.filter(user=user_obj, name="Widget").exists())
+    
+    def test_invalid_product_name(self):
+        response = self.client.post(reverse("supplysync:create-product"), {
+            "product_name": "!!!",
+            "product_sku": "SKU123",
+            "product_category": "Tools",
+            "product_quantity": "10",
+            "product_weight": "1.5",
+            "product_cost": "5",
+            "product_price": "10"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertFalse(Product.objects.filter(user=user_obj, name="!!!").exists())
+
+    def test_invalid_product_quantity(self):
+        response = self.client.post(reverse("supplysync:create-product"), {
+            "product_name": "Widget2",
+            "product_sku": "SKU123",
+            "product_category": "Tools",
+            "product_quantity": "test",
+            "product_weight": "1.5",
+            "product_cost": "5",
+            "product_price": "10"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertFalse(Product.objects.filter(user=user_obj, name="Widget2").exists())
+class InventoryViewTests(BaseTestCase):
+    def test_inventory_get(self):
+        response = self.client.get(reverse("supplysync:products"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "inventory.html")
+        
+class EditProductViewTests(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        create_update_product(
+            prod_name="Item",
+            prod_sku="SKU1",
+            prod_category="Cat",
+            user_name="testuser",
+            prod_quantity=1,
+            prod_weight=1,
+            prod_cost=1,
+            prod_price=2
+        )
+
+    def test_edit_product_valid(self):
+        response = self.client.post(
+            reverse("supplysync:edit", args=["Item", "SKU1"]),
+            {
+                "product_name": "Item2",
+                "product_sku": "SKU1",
+                "product_category": "Cat",
+                "product_quantity": "2",
+                "product_weight": "2",
+                "product_cost": "2",
+                "product_price": "4"
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertTrue(Product.objects.filter(user=user_obj, name="Item2").exists())
+    
+    def test_edit_invalid_product_name(self):
+        response = self.client.post(
+            reverse("supplysync:edit", args=["Item", "SKU1"]),
+            {
+                "product_name": "!!!!",
+                "product_sku": "SKU1",
+                "product_category": "Cat",
+                "product_quantity": "2",
+                "product_weight": "2",
+                "product_cost": "2",
+                "product_price": "4"
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertFalse(Product.objects.filter(user=user_obj, name="!!!!").exists())
+        
+    def test_edit_invalid_product_weight(self):
+        response = self.client.post(
+            reverse("supplysync:edit", args=["Item", "SKU1"]),
+            {
+                "product_name": "Item2",
+                "product_sku": "SKU1",
+                "product_category": "Cat",
+                "product_quantity": "2",
+                "product_weight": "test",
+                "product_cost": "2",
+                "product_price": "4"
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertFalse(Product.objects.filter(user=user_obj, name="Item2").exists())
+
+class DeleteProductViewTests(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        create_update_product(
+            prod_name="Item",
+            prod_sku="SKU1",
+            prod_category="Cat",
+            user_name="testuser",
+            prod_quantity=1,
+            prod_weight=1,
+            prod_cost=1,
+            prod_price=2
+        )
+
+    def test_delete_product(self):
+        response = self.client.post(
+            reverse("supplysync:delete", args=["Item", "SKU1"])
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user_obj = User.objects.filter(name="testuser").first()
+        self.assertFalse(Product.objects.filter(user=user_obj, name="Item").exists())

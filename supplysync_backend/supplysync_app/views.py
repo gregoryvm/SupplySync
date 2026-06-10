@@ -76,7 +76,7 @@ class UsersView(APIView):
             if new_username and not re.fullmatch(r"[A-Za-z0-9@.+_-]+", new_username):
                 messages.error(request, "Invalid username characters.")
                 return redirect('supplysync:account')
-            elif len(new_username) > 150:
+            elif new_username and len(new_username) > 150:
                 messages.error(request, "Username too long.")
                 return redirect('supplysync:account')
             elif new_password and len(new_password) < 8:
@@ -184,7 +184,6 @@ class ProductsView(APIView):
                 return redirect('supplysync:create-product')
             
             if new_quantity:
-                print("quan")
                 try:
                     new_quantity = float(new_quantity)
                 except ValueError:
@@ -195,7 +194,6 @@ class ProductsView(APIView):
                     messages.error(request, "Quantity must be positive.")
                     return redirect('supplysync:create-product') 
             else:
-                print("no quan")
                 messages.error(request, "Product quantity must not be blank.")
                 return redirect('supplysync:create-product')
             
@@ -319,7 +317,6 @@ class ProductsView(APIView):
                     messages.error(request, "Quantity must be positive.")
                     return redirect('supplysync:edit', name=product.name, sku=product.sku)
             else:
-                print("no quan")
                 messages.error(request, "Product quantity must not be blank.")
                 return redirect('supplysync:edit', name=product.name, sku=product.sku)
             
