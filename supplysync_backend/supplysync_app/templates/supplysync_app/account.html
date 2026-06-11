@@ -10,7 +10,7 @@
 {% endif %}
 <form method="post">
     <input type="text" name="newname" title="150 characters or fewer. Letters, digits and @/./+/-/_ only." maxlength="150" pattern="[A-Za-z0-9@.+_-]+" placeholder="Enter a new username..." value="{{request.POST.newname}}">
-    <input type="text" name="newpassword" title="Must be at least 8 characters and contain both letters and numbers." minlength="8" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$" placeholder="Enter a new password..." value="{{request.POST.password}}">
+    <input type="password" name="newpassword" title="Must be at least 8 characters and contain both letters and numbers." minlength="8" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$" placeholder="Enter a new password..." value="{{request.POST.password}}">
     {% csrf_token %}
     <button type ="submit">Submit Changes</button>
 </form>

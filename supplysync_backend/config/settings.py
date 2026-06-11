@@ -148,7 +148,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#STATICFILES_DIRS = [BASE_DIR / "supplysync_backend"/ "supplysync_app" / "static" / "supplysync_app"]
 STATICFILES_DIRS = [BASE_DIR / "supplysync_backend" / "static"]
 
 LOGIN_URL = "login"

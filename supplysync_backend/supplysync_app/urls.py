@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-#from views import ProductsView
+
 app_name = 'supplysync'
 
 urlpatterns = [
@@ -17,4 +17,3 @@ urlpatterns = [
     path('products/delete/<str:name>/<str:sku>', views.ProductsView.delete_view, name='delete'),
     path('products/edit/<str:name>/<str:sku>', views.ProductsView.edit_view, name='edit'),
 ]
-    

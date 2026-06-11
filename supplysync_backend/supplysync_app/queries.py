@@ -5,24 +5,6 @@ from .models import (
     Product
 )
 
-MAX_STRING = 200
-
-#    user_id = models.AutoField(primary_key=True)
-#    name = models.CharField(max_length=200)
-#    password = models.CharField(max_length=200)
-
-#    product_id = models.AutoField(primary_key=True)
-#    name = models.CharField(max_length=200)
-#    sku = models.CharField(max_length=200)
-#    category = models.CharField(max_length=200)
-#    user = models.ForeignKey(User, on_delete=models.CASCADE)
-#    quantity = models.IntegerField()
-#    weight = models.FloatField()
-#    cost =  models.FloatField()
-#    price =  models.FloatField()
-
-
-# ADD CONTRAINTS VIA CONSTANTS
 
 def create_user(user_name: str, user_password: str):
     User.objects.all().values_list('user_id', flat=True)
@@ -69,9 +51,6 @@ def get_user(user_name: str):
 
 
 def delete_user(user_name: str):
-    # Deletes user object given user_id and/or name, hierarchical search
-    # starting with id and cascading to name if not found. Returns string
-    # if user not found or user was deleted.
 
     user_obj = User.objects.filter(name=user_name).first()
     if user_obj is not None:
@@ -133,16 +112,13 @@ def get_product(name: str = None, sku: str = None,
         filters['user'] = user_obj
 
         if name is not None:
-            query |= Q(**{'name__icontains':name})
-            #filters['name__icontains'] = name
-        
+            query |= Q(**{'name__icontains': name})
+
         if sku is not None:
-            query |= Q(**{'sku__icontains':sku})
-            #filters['sku__icontains'] = sku
+            query |= Q(**{'sku__icontains': sku})
 
         if category is not None:
-            query |= Q(**{'category__icontains':category})
-            #filters['category__icontains'] = category
+            query |= Q(**{'category__icontains': category})
 
         if quantity_min is not None:
             filters['quantity__gte'] = quantity_min
@@ -161,14 +137,14 @@ def get_product(name: str = None, sku: str = None,
 
         if cost_max is not None:
             filters['cost__lte'] = cost_max
-        
+
         if price_min is not None:
             filters['price__gte'] = price_min
 
         if price_max is not None:
             filters['price__lte'] = price_max
-  
-        products = products.filter(query,**filters)              
+
+        products = products.filter(query, **filters)
     else:
         products = "User Not Found."
     return products

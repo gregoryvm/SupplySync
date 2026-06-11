@@ -1,4 +1,3 @@
-from django.db import connections
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import (
@@ -686,7 +685,8 @@ class BaseTestCase(TestCase):
 
         self.client = Client()
         self.client.force_login(self.auth_user)
-    
+
+
 class HomeViewTests(BaseTestCase):
     def test_home_page_loads(self):
         response = self.client.get(reverse("supplysync:home"))
@@ -714,7 +714,7 @@ class SignupViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertFalse(AuthUser.objects.filter(username="testuser", password="StrongPass123!").exists())
-    
+
     def test_signup_invalid_user_password_len(self):
         response = self.client.post(reverse("supplysync:signup"), {
             "username": "newuser2",
@@ -724,7 +724,7 @@ class SignupViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(AuthUser.objects.filter(username="newuser2", password="4444").exists())
-    
+
     def test_signup_invalid_user_password_match(self):
         response = self.client.post(reverse("supplysync:signup"), {
             "username": "newuser4",
@@ -737,13 +737,14 @@ class SignupViewTests(TestCase):
 
     def test_signup_invalid_user_username(self):
         response = self.client.post(reverse("supplysync:signup"), {
-            "username": "!!!!!!!!!!!!!!!!!!!!!!!",
+            "username": "!!!!!!!!!!!!!!!!!!!!!",
             "password1": "StrongPass123!",
             "password2": "StrongPass123!"
         })
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(AuthUser.objects.filter(username="!!!!!!!!!!!!!!!!!!!!!!!", password="StrongPass123!").exists())
+        self.assertFalse(AuthUser.objects.filter(username="!!!!!!!!!!!!!!!!!!!!!", password="StrongPass123!").exists())
+
 
 class LoginViewTests(TestCase):
     def setUp(self):
@@ -760,10 +761,12 @@ class LoginViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
+
 class LogoutViewTests(BaseTestCase):
     def test_logout_redirects(self):
         response = self.client.post(reverse("supplysync:logout"))
         self.assertEqual(response.status_code, 302)
+
 
 class AccountViewTests(BaseTestCase):
     def test_account_username_change(self):
@@ -799,6 +802,8 @@ class AccountViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user = AuthUser.objects.get(pk=self.auth_user.pk)
         self.assertFalse(user.check_password("4444"))
+
+
 class CreateProductViewTests(BaseTestCase):
     def test_valid_product_creation(self):
         response = self.client.post(reverse("supplysync:create-product"), {
@@ -814,7 +819,7 @@ class CreateProductViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user_obj = User.objects.filter(name="testuser").first()
         self.assertTrue(Product.objects.filter(user=user_obj, name="Widget").exists())
-    
+
     def test_invalid_product_name(self):
         response = self.client.post(reverse("supplysync:create-product"), {
             "product_name": "!!!",
@@ -844,12 +849,15 @@ class CreateProductViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user_obj = User.objects.filter(name="testuser").first()
         self.assertFalse(Product.objects.filter(user=user_obj, name="Widget2").exists())
+
+
 class InventoryViewTests(BaseTestCase):
     def test_inventory_get(self):
         response = self.client.get(reverse("supplysync:products"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "inventory.html")
-        
+
+
 class EditProductViewTests(BaseTestCase):
     def setUp(self):
         super().setUp()
@@ -882,7 +890,7 @@ class EditProductViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user_obj = User.objects.filter(name="testuser").first()
         self.assertTrue(Product.objects.filter(user=user_obj, name="Item2").exists())
-    
+
     def test_edit_invalid_product_name(self):
         response = self.client.post(
             reverse("supplysync:edit", args=["Item", "SKU1"]),
@@ -900,7 +908,7 @@ class EditProductViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user_obj = User.objects.filter(name="testuser").first()
         self.assertFalse(Product.objects.filter(user=user_obj, name="!!!!").exists())
-        
+
     def test_edit_invalid_product_weight(self):
         response = self.client.post(
             reverse("supplysync:edit", args=["Item", "SKU1"]),
@@ -918,6 +926,7 @@ class EditProductViewTests(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         user_obj = User.objects.filter(name="testuser").first()
         self.assertFalse(Product.objects.filter(user=user_obj, name="Item2").exists())
+
 
 class DeleteProductViewTests(BaseTestCase):
     def setUp(self):
