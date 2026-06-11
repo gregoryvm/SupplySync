@@ -1,10 +1,20 @@
-{% extends 'base_layout.html' %}
+{% load static %}
 
-{% block content %}
-<h1>Login</h1>
-<form class="site-form" action="/login/"method="post">
-    {% csrf_token %}
-    {{form}}
-    <input type="submit"value="Login">
-</form>
-{% endblock %}
+<link rel="stylesheet" href="{% static 'supplysync_app/style.css' %}">
+
+<header class="wrapper">
+    <img src="{% static 'supplysync_app/supplysync.png' %}" class="logo">
+</header>
+
+<main class="auth-container">
+    <h1>Login</h1>
+
+    <form class="site-form" action="{% url 'supplysync:login' %}" method="post">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+        {{ form }}
+
+        <input type="submit" value="Login">
+    </form>
+</main>

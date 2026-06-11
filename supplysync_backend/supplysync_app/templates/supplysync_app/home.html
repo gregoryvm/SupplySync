@@ -1,8 +1,15 @@
-{% block content %}
-    <a href="{% url 'supplysync:signup' %}">
-        <button type="submit">Signup</button>
-    </a>
-    <a href="{% url 'supplysync:login' %}">
-        <button type="submit">Login</button>
-    </a>
-{% endblock %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'supplysync_app/style.css' %}">
+
+<body class="home-page">
+    <img src="{% static 'supplysync_app/supplysync.png' %}" class="home-logo">
+
+    <div class="button-group">
+        <a href="{% url 'supplysync:signup' %}">
+            <button id="home-signup">Signup</button>
+        </a>
+        <a href="{% url 'supplysync:login' %}">
+            <button id="home-login">Login</button>
+        </a>
+    </div>
+</body>

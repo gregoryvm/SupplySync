@@ -22,13 +22,5 @@ class Product(models.Model):
     cost = models.FloatField(null=True)
     price = models.FloatField(null=True)
 
-    # class Meta:
-    #    constraints = [
-    #        models.UniqueConstraint(
-    #            fields=('sku','user'),
-    #            name = "unique sku by user"
-    #        )
-    #    ]
-
     def __str__(self):
         return self.name

@@ -15,6 +15,8 @@ import os
 import environ
 import random
 
+CONN_MAX_AGE = 0
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 print(os.path.join(BASE_DIR, '.env'))
@@ -146,7 +148,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#STATICFILES_DIRS = [BASE_DIR / "supplysync_backend"/ "supplysync_app" / "static" / "supplysync_app"]
 STATICFILES_DIRS = [BASE_DIR / "supplysync_backend" / "static"]
 
 LOGIN_URL = "login"
