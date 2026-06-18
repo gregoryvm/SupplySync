@@ -1,5 +1,5 @@
 # SupplySync
-SupplySync is a full-stack inventory management system designed to assist users with manage their products. 
+SupplySync is a full-stack inventory management system designed to assist users with managing their products. 
 
 We're currently hosted at:
 - https://supplysync-er1f.onrender.com/
