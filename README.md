@@ -4,6 +4,8 @@ SupplySync is a full-stack inventory management system designed to assist users 
 We're currently hosted at:
 - https://supplysync-er1f.onrender.com/
 
+** Please note the site may not work currently, as database size has exceeded provider limit **
+
 ## Tech Stack
 ### Backend:
 - Python
